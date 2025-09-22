@@ -2,7 +2,8 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Heart, Zap } from 'lucide-react';
+import { Play, Zap } from 'lucide-react';
+import FavoriteButton from '@/components/FavoriteButton';
 
 interface Artist {
   id: string;
@@ -79,9 +80,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip }) => {
             <Zap className="h-3 w-3 mr-1" />
             Tip
           </Button>
-          <Button variant="ghost" size="sm">
-            <Heart className="h-3 w-3" />
-          </Button>
+          <FavoriteButton trackId={artist.id} />
         </div>
       </div>
     </Card>

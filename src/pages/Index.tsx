@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play, TrendingUp, Users, Zap, ExternalLink, ChevronRight } from 'lucide-react';
+import { Play, TrendingUp, Users, Zap, ExternalLink, ChevronRight, Plus } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import AudioPlayer from '@/components/AudioPlayer';
 import ArtistCard from '@/components/ArtistCard';
 import WaveformVisualizer from '@/components/WaveformVisualizer';
+import FavoriteButton from '@/components/FavoriteButton';
+import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import { audiusService } from '@/services/audius';
 import heroImage from '@/assets/hero-audiobase.jpg';
@@ -172,9 +174,17 @@ const Index = () => {
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-1">{track.user.name}</p>
                     </div>
-                    <Button size="sm" className="opacity-0 group-hover:opacity-100 transition-smooth gradient-primary">
-                      <Play className="h-3 w-3" />
-                    </Button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-smooth">
+                      <Button size="sm" className="gradient-primary">
+                        <Play className="h-3 w-3" />
+                      </Button>
+                      <FavoriteButton trackId={track.id} />
+                      <AddToPlaylistDialog trackId={track.id}>
+                        <Button variant="ghost" size="sm">
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </AddToPlaylistDialog>
+                    </div>
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
