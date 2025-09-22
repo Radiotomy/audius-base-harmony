@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
+// Force refresh by updating import
 import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Share, List, MoreHorizontal } from 'lucide-react';
 import { useAudioPlayer, type Track } from '@/hooks/useAudioPlayer';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -21,6 +22,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   isCompact = false,
   showQueue = false
 }) => {
+  // Fixed: Using List instead of Queue icon
   const {
     currentTrack,
     isPlaying,
