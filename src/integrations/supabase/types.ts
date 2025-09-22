@@ -14,7 +14,194 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audius_tracks: {
+        Row: {
+          artist_id: string
+          artist_name: string
+          artwork_url: string | null
+          cached_at: string | null
+          duration: number | null
+          id: string
+          play_count: number | null
+          stream_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          artist_id: string
+          artist_name: string
+          artwork_url?: string | null
+          cached_at?: string | null
+          duration?: number | null
+          id: string
+          play_count?: number | null
+          stream_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          artist_id?: string
+          artist_name?: string
+          artwork_url?: string | null
+          cached_at?: string | null
+          duration?: number | null
+          id?: string
+          play_count?: number | null
+          stream_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      playlist_tracks: {
+        Row: {
+          added_at: string | null
+          id: string
+          playlist_id: string
+          position: number
+          track_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          id?: string
+          playlist_id: string
+          position: number
+          track_id: string
+        }
+        Update: {
+          added_at?: string | null
+          id?: string
+          playlist_id?: string
+          position?: number
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_tracks_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "user_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "audius_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          audius_handle: string | null
+          audius_user_id: string | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          audius_handle?: string | null
+          audius_user_id?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          audius_handle?: string | null
+          audius_user_id?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "audius_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_playlists: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +210,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "fan" | "artist" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +337,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["fan", "artist", "admin"],
+    },
   },
 } as const
