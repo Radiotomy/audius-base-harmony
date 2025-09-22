@@ -3,20 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ExternalLink, RefreshCw, Clock, CheckCircle, XCircle } from 'lucide-react';
-import { useWeb3 } from '@/contexts/Web3Context';
+import { ExternalLink, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import { useAccount, usePublicClient, useChainId } from 'wagmi';
 import { useSolana } from '@/contexts/SolanaContext';
 import { useToast } from '@/hooks/use-toast';
-import { ethers } from 'ethers';
+import { formatEther } from 'viem';
 
 interface EthereumTransaction {
   hash: string;
-  blockNumber: number;
+  blockNumber: bigint;
   from: string;
-  to: string;
+  to: string | null;
   value: string;
-  gasPrice: string;
-  gasUsed: string;
   timestamp: number;
   status: 'success' | 'failed';
 }
@@ -29,8 +27,10 @@ interface SolanaTransaction {
   status: 'success' | 'failed';
 }
 
-const TransactionHistory = () => {
-  const web3 = useWeb3();
+const OnchainTransactionHistory = () => {
+  const { address, isConnected } = useAccount();
+  const publicClient = usePublicClient();
+  const chainId = useChainId();
   const solana = useSolana();
   const { toast } = useToast();
   
@@ -40,35 +40,35 @@ const TransactionHistory = () => {
   const [activeTab, setActiveTab] = useState<'ethereum' | 'solana'>('ethereum');
 
   const fetchEthereumTransactions = async () => {
-    if (!web3.provider || !web3.account) return;
+    if (!publicClient || !address) return;
 
     setLoading(true);
     try {
-      // Get recent transactions (last 10)
-      const latestBlock = await web3.provider.getBlockNumber();
+      // Get recent transactions (simplified - in production use proper indexing)
+      const latestBlockNumber = await publicClient.getBlockNumber();
       const transactions: EthereumTransaction[] = [];
 
-      // Scan last 1000 blocks for user transactions
-      for (let i = 0; i < 1000 && transactions.length < 10; i++) {
+      // Scan last 100 blocks for user transactions
+      for (let i = 0; i < 100 && transactions.length < 10; i++) {
         try {
-          const block = await web3.provider.getBlock(latestBlock - i, true);
+          const block = await publicClient.getBlock({
+            blockNumber: latestBlockNumber - BigInt(i),
+            includeTransactions: true,
+          });
+
           if (block && block.transactions) {
-            const validTransactions = block.transactions.filter(tx => tx && typeof tx === 'object');
-            for (const txData of validTransactions) {
-              if ((txData as any).from === web3.account || (txData as any).to === web3.account) {
-                const tx = txData as any;
-                const receipt = await web3.provider.getTransactionReceipt(tx.hash);
+            for (const tx of block.transactions) {
+              if (typeof tx === 'object' && (tx.from === address || tx.to === address)) {
+                const receipt = await publicClient.getTransactionReceipt({ hash: tx.hash });
                 
                 transactions.push({
                   hash: tx.hash,
-                  blockNumber: tx.blockNumber || 0,
+                  blockNumber: tx.blockNumber || 0n,
                   from: tx.from,
-                  to: tx.to || '',
-                  value: ethers.formatEther(tx.value || '0'),
-                  gasPrice: ethers.formatUnits(tx.gasPrice || '0', 'gwei'),
-                  gasUsed: receipt?.gasUsed.toString() || '0',
-                  timestamp: block.timestamp,
-                  status: receipt?.status === 1 ? 'success' : 'failed',
+                  to: tx.to,
+                  value: formatEther(tx.value),
+                  timestamp: Number(block.timestamp),
+                  status: receipt.status === 'success' ? 'success' : 'failed',
                 });
 
                 if (transactions.length >= 10) break;
@@ -99,8 +99,7 @@ const TransactionHistory = () => {
 
     setLoading(true);
     try {
-      // Note: In a real app, you'd use Solana's getSignaturesForAddress
-      // This is a simplified version
+      // Simplified mock data - in production use Solana RPC methods
       const transactions: SolanaTransaction[] = [
         {
           signature: '5j8rVm2Emh7UzTzgJjHxKJPqC7VDFh9L4TuQXwzaGjLpB3Wi4B9zf3VdY9zCeJ6mFnE2vKdoXwbKJhL8aDqVuN7M',
@@ -132,12 +131,12 @@ const TransactionHistory = () => {
   };
 
   useEffect(() => {
-    if (activeTab === 'ethereum' && web3.isConnected) {
+    if (activeTab === 'ethereum' && isConnected) {
       fetchEthereumTransactions();
     } else if (activeTab === 'solana' && solana.connected) {
       fetchSolanaTransactions();
     }
-  }, [activeTab, web3.isConnected, solana.connected, web3.account, solana.publicKey]);
+  }, [activeTab, isConnected, solana.connected, address, solana.publicKey]);
 
   const formatTimestamp = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleString();
@@ -145,7 +144,12 @@ const TransactionHistory = () => {
 
   const getExplorerUrl = (type: 'ethereum' | 'solana', hash: string) => {
     if (type === 'ethereum') {
-      const baseUrl = web3.chainId === 1 ? 'https://etherscan.io' : `https://etherscan.io`; // Simplified
+      const baseUrls: { [key: number]: string } = {
+        1: 'https://etherscan.io',
+        8453: 'https://basescan.org',
+        11155111: 'https://sepolia.etherscan.io',
+      };
+      const baseUrl = baseUrls[chainId] || 'https://etherscan.io';
       return `${baseUrl}/tx/${hash}`;
     } else {
       return `https://explorer.solana.com/tx/${hash}`;
@@ -178,7 +182,7 @@ const TransactionHistory = () => {
           </TabsList>
 
           <TabsContent value="ethereum" className="space-y-4">
-            {!web3.isConnected ? (
+            {!isConnected ? (
               <p className="text-center text-muted-foreground py-8">
                 Connect your Ethereum wallet to view transaction history
               </p>
@@ -217,7 +221,7 @@ const TransactionHistory = () => {
                       <div>
                         <span className="text-muted-foreground">To:</span>
                         <br />
-                        <code>{formatAddress(tx.to)}</code>
+                        <code>{formatAddress(tx.to || '')}</code>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Value:</span>
@@ -295,4 +299,4 @@ const TransactionHistory = () => {
   );
 };
 
-export default TransactionHistory;
+export default OnchainTransactionHistory;

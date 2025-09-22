@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Link, Unlink, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useWeb3 } from '@/contexts/Web3Context';
+import { useAccount } from 'wagmi';
 import { useSolana } from '@/contexts/SolanaContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,9 +15,9 @@ interface WalletBinding {
   created_at: string;
 }
 
-const Web3AuthIntegration = () => {
+const OnchainWeb3AuthIntegration = () => {
   const { user } = useAuth();
-  const web3 = useWeb3();
+  const { address, isConnected } = useAccount();
   const solana = useSolana();
   const { toast } = useToast();
   const [bindings, setBindings] = useState<WalletBinding[]>([]);
@@ -162,23 +162,23 @@ const Web3AuthIntegration = () => {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium">Ethereum Wallet</h4>
-            {web3.isConnected && (
-              <Badge variant={isWalletLinked(web3.account!) ? 'default' : 'secondary'}>
-                {isWalletLinked(web3.account!) ? 'Linked' : 'Connected'}
+            {isConnected && address && (
+              <Badge variant={isWalletLinked(address) ? 'default' : 'secondary'}>
+                {isWalletLinked(address) ? 'Linked' : 'Connected'}
               </Badge>
             )}
           </div>
 
-          {web3.isConnected ? (
+          {isConnected && address ? (
             <div className="flex items-center gap-3">
               <code className="text-sm bg-muted px-2 py-1 rounded flex-1">
-                {web3.account?.slice(0, 6)}...{web3.account?.slice(-4)}
+                {address.slice(0, 6)}...{address.slice(-4)}
               </code>
               
-              {!isWalletLinked(web3.account!) ? (
+              {!isWalletLinked(address) ? (
                 <Button
                   size="sm"
-                  onClick={() => linkWallet('ethereum', web3.account!)}
+                  onClick={() => linkWallet('ethereum', address)}
                   disabled={loading}
                   className="shrink-0"
                 >
@@ -195,7 +195,7 @@ const Web3AuthIntegration = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => unlinkWallet(web3.account!)}
+                  onClick={() => unlinkWallet(address)}
                   disabled={loading}
                   className="shrink-0"
                 >
@@ -309,4 +309,4 @@ const Web3AuthIntegration = () => {
   );
 };
 
-export default Web3AuthIntegration;
+export default OnchainWeb3AuthIntegration;

@@ -11,7 +11,7 @@ import ArtistCard from '@/components/ArtistCard';
 import WaveformVisualizer from '@/components/WaveformVisualizer';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
-import WalletConnect from '@/components/WalletConnect';
+import WalletConnect from '@/components/OnchainWallet';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import { audiusService } from '@/services/audius';
 import heroImage from '@/assets/hero-audiobase.jpg';
