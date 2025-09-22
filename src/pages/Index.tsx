@@ -47,21 +47,7 @@ const Index = () => {
 
   // Test audio streaming on component mount (development only)
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      // Automatically test audio streaming when component loads
-      testWithTrendingTrack()
-        .then((result) => {
-          console.log('🎉 Audio streaming test successful:', result);
-        })
-        .catch((error) => {
-          console.error('⚠️  Audio streaming test failed:', error);
-        });
-    }
-  }, []);
-
-  // Test audio streaming on component mount (development only)
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       // Automatically test audio streaming when component loads
       testWithTrendingTrack()
         .then((result) => {
