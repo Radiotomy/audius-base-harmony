@@ -2,46 +2,53 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Play, TrendingUp, Users, Zap, ExternalLink, ChevronRight } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import AudioPlayer from '@/components/AudioPlayer';
 import ArtistCard from '@/components/ArtistCard';
 import WaveformVisualizer from '@/components/WaveformVisualizer';
+import { useAudiusTrendingTracks } from '@/hooks/useAudius';
+import { audiusService } from '@/services/audius';
 import heroImage from '@/assets/hero-audiobase.jpg';
 
 const Index = () => {
   const [showPlayer, setShowPlayer] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState<any>(null);
+  
+  // Fetch real Audius data
+  const { tracks: trendingTracks, loading: tracksLoading } = useAudiusTrendingTracks(6);
 
-  const trendingTracks = [
-    { id: '1', title: 'Digital Dreams', artist: 'CryptoBeats', plays: '125K', tips: '2.3 ETH' },
-    { id: '2', title: 'Neon Nights', artist: 'BaseBass', plays: '89K', tips: '1.8 ETH' },
-    { id: '3', title: 'Sonic Waves', artist: 'ChainMelody', plays: '76K', tips: '1.2 ETH' },
-  ];
+  // Transform Audius data for featured artists (using trending artists from tracks)
+  const featuredArtists = React.useMemo(() => {
+    const artistMap = new Map();
+    
+    trendingTracks.forEach(track => {
+      if (!artistMap.has(track.user.id)) {
+        artistMap.set(track.user.id, {
+          id: track.user.id,
+          name: track.user.name,
+          followers: '0', // We'll need to fetch this separately
+          avatar: track.user.profile_picture?.['150x150'],
+          genre: track.genre || 'Various',
+          topTrack: track.title
+        });
+      }
+    });
+    
+    return Array.from(artistMap.values()).slice(0, 3);
+  }, [trendingTracks]);
 
-  const featuredArtists = [
-    { 
-      id: '1', 
-      name: 'CryptoBeats', 
-      followers: '45K', 
-      verified: true,
-      genre: 'Electronic',
-      topTrack: 'Digital Dreams'
-    },
-    { 
-      id: '2', 
-      name: 'BaseBass', 
-      followers: '38K', 
-      genre: 'Hip-Hop',
-      topTrack: 'Neon Nights'
-    },
-    { 
-      id: '3', 
-      name: 'ChainMelody', 
-      followers: '29K', 
-      genre: 'Ambient',
-      topTrack: 'Sonic Waves'
-    },
-  ];
+  const handleTrackPlay = (track: any) => {
+    setSelectedTrack({
+      id: track.id,
+      title: track.title,
+      artist: track.user?.name || track.artist,
+      duration: track.duration || 0,
+      cover: track.artwork?.['480x480'] || track.artwork?.['150x150']
+    });
+    setShowPlayer(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,33 +137,57 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {trendingTracks.map((track, index) => (
-              <Card key={track.id} className="p-6 shadow-card bg-card hover:shadow-glow transition-smooth group cursor-pointer">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="text-2xl font-bold text-muted-foreground">
-                    #{index + 1}
+            {tracksLoading ? (
+              // Loading skeletons
+              [...Array(6)].map((_, index) => (
+                <Card key={index} className="p-6 shadow-card bg-card">
+                  <div className="flex items-center gap-4 mb-4">
+                    <Skeleton className="text-2xl font-bold w-8 h-8" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                    <Skeleton className="w-8 h-8 rounded" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-smooth">
-                      {track.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{track.artist}</p>
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-3 w-12" />
                   </div>
-                  <Button size="sm" className="opacity-0 group-hover:opacity-100 transition-smooth gradient-primary">
-                    <Play className="h-3 w-3" />
-                  </Button>
-                </div>
-                
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    {track.plays} plays
-                  </span>
-                  <span className="text-accent font-medium">
-                    {track.tips}
-                  </span>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))
+            ) : (
+              trendingTracks.slice(0, 6).map((track, index) => (
+                <Card 
+                  key={track.id} 
+                  className="p-6 shadow-card bg-card hover:shadow-glow transition-smooth group cursor-pointer"
+                  onClick={() => handleTrackPlay(track)}
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="text-2xl font-bold text-muted-foreground">
+                      #{index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-smooth line-clamp-1">
+                        {track.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-1">{track.user.name}</p>
+                    </div>
+                    <Button size="sm" className="opacity-0 group-hover:opacity-100 transition-smooth gradient-primary">
+                      <Play className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {track.play_count?.toLocaleString() || '0'} plays
+                    </span>
+                    <span className="text-accent font-medium">
+                      🎵 Audius
+                    </span>
+                  </div>
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -176,7 +207,11 @@ const Index = () => {
               <ArtistCard 
                 key={artist.id} 
                 artist={artist}
-                onPlay={() => setShowPlayer(true)}
+                onPlay={() => handleTrackPlay({ 
+                  id: artist.id, 
+                  title: artist.topTrack, 
+                  user: { name: artist.name } 
+                })}
                 onTip={() => console.log('Tip artist:', artist.name)}
               />
             ))}
@@ -239,7 +274,12 @@ const Index = () => {
       </section>
 
       {/* Player */}
-      {showPlayer && <AudioPlayer isCompact />}
+      {showPlayer && selectedTrack && (
+        <AudioPlayer 
+          track={selectedTrack}
+          isCompact 
+        />
+      )}
     </div>
   );
 };
