@@ -283,13 +283,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Player */}
-      {showPlayer && selectedTrack && (
-        <AudioPlayer 
-          track={selectedTrack}
-          isCompact 
-        />
-      )}
+        {showPlayer && selectedTrack && (
+          <AudioPlayer 
+            initialTrack={selectedTrack}
+            isCompact 
+          />
+        )}
     </div>
   );
 };
