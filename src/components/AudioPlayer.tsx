@@ -170,13 +170,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         <div className="text-center">
           <h3 className="text-xl font-bold">{currentTrack.title}</h3>
           <p className="text-muted-foreground">by {currentTrack.artist}</p>
-          {currentTrack.cover && (
-            <img
-              src={currentTrack.cover}
-              alt={currentTrack.title}
-              className="w-32 h-32 object-cover rounded-lg mx-auto mt-4"
-            />
-          )}
+          <div className="w-32 h-32 mx-auto mt-4 rounded-lg overflow-hidden bg-muted/50 flex items-center justify-center">
+            {currentTrack.cover ? (
+              <img
+                src={currentTrack.cover}
+                alt={currentTrack.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = '<div class="text-4xl">🎵</div>';
+                }}
+              />
+            ) : (
+              <div className="text-4xl">🎵</div>
+            )}
+          </div>
         </div>
 
         {/* Waveform */}

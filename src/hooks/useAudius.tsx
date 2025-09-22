@@ -139,15 +139,22 @@ export const useAudiusStreamUrl = (trackId: string | null) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!trackId) return;
+    if (!trackId) {
+      setStreamUrl(null);
+      return;
+    }
+
+    console.log('Fetching stream URL for track ID:', trackId);
 
     const getStreamUrl = async () => {
       try {
         setLoading(true);
         const url = await audiusService.getStreamUrl(trackId);
+        console.log('Stream URL received:', url);
         setStreamUrl(url);
       } catch (err) {
         console.error('Error getting stream URL:', err);
+        setStreamUrl(null);
       } finally {
         setLoading(false);
       }

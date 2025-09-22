@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Play, TrendingUp, Users, Zap, ExternalLink, ChevronRight, Plus } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import AudioPlayer from '@/components/AudioPlayer';
@@ -10,6 +11,7 @@ import ArtistCard from '@/components/ArtistCard';
 import WaveformVisualizer from '@/components/WaveformVisualizer';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
+import WalletConnect from '@/components/WalletConnect';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import { audiusService } from '@/services/audius';
 import heroImage from '@/assets/hero-audiobase.jpg';
@@ -17,6 +19,7 @@ import heroImage from '@/assets/hero-audiobase.jpg';
 const Index = () => {
   const [showPlayer, setShowPlayer] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
+  const [showWalletDialog, setShowWalletDialog] = useState(false);
   
   // Fetch real Audius data
   const { tracks: trendingTracks, loading: tracksLoading } = useAudiusTrendingTracks(6);
@@ -41,13 +44,36 @@ const Index = () => {
     return Array.from(artistMap.values()).slice(0, 3);
   }, [trendingTracks]);
 
+  const formatDuration = (seconds: number) => {
+    if (!seconds || seconds === 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getArtworkUrl = (artwork: any) => {
+    if (!artwork) return null;
+    
+    // Handle different Audius artwork formats
+    if (typeof artwork === 'string') return artwork;
+    if (artwork['480x480']) return artwork['480x480'];
+    if (artwork['150x150']) return artwork['150x150'];
+    if (artwork.large) return artwork.large;
+    if (artwork.small) return artwork.small;
+    
+    return null;
+  };
+
   const handleTrackPlay = (track: any) => {
+    const artworkUrl = getArtworkUrl(track.artwork);
+    
     setSelectedTrack({
       id: track.id,
       title: track.title,
       artist: track.user?.name || track.artist,
-      duration: track.duration || 0,
-      cover: track.artwork?.['480x480'] || track.artwork?.['150x150']
+      duration: formatDuration(track.duration || 0),
+      cover: artworkUrl,
+      audiusId: track.id  // Critical: Add the audiusId field for streaming
     });
     setShowPlayer(true);
   };
@@ -88,14 +114,24 @@ const Index = () => {
                 <Play className="h-5 w-5 mr-2" />
                 Start Listening
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-accent text-accent hover:bg-accent hover:text-accent-foreground px-8 py-6 text-lg"
-              >
-                Connect Wallet
-                <ExternalLink className="h-5 w-5 ml-2" />
-              </Button>
+              <Dialog open={showWalletDialog} onOpenChange={setShowWalletDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="border-accent text-accent hover:bg-accent hover:text-accent-foreground px-8 py-6 text-lg"
+                  >
+                    Connect Wallet
+                    <ExternalLink className="h-5 w-5 ml-2" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Connect Your Wallet</DialogTitle>
+                  </DialogHeader>
+                  <WalletConnect />
+                </DialogContent>
+              </Dialog>
             </div>
 
             <div className="flex justify-center pt-8">
@@ -188,9 +224,10 @@ const Index = () => {
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {track.play_count?.toLocaleString() || '0'} plays
-                    </span>
+                    <div className="text-muted-foreground">
+                      <span className="mr-3">{track.play_count?.toLocaleString() || '0'} plays</span>
+                      <span>{formatDuration(track.duration || 0)}</span>
+                    </div>
                     <span className="text-accent font-medium">
                       🎵 Audius
                     </span>
