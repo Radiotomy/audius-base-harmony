@@ -47,6 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // AudioBASE colors
+        "base-blue": "hsl(var(--base-blue))",
+        "audius-purple": "hsl(var(--audius-purple))",
+        "success-green": "hsl(var(--success-green))",
+        "warning-amber": "hsl(var(--warning-amber))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -84,6 +89,9 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "waveform-dance": "waveform-dance 2s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "float": "float 3s ease-in-out infinite",
       },
     },
   },
