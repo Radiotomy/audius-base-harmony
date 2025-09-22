@@ -18,19 +18,26 @@ export const useAudiusTrendingTracks = (limit: number = 10) => {
         const audiusTracks = await audiusService.getTrendingTracks(limit);
         setTracks(audiusTracks);
 
-        // Cache tracks in Supabase for faster subsequent loads
+        // Cache tracks in Supabase for faster subsequent loads (only if authenticated)
         if (audiusTracks.length > 0) {
           const transformedTracks = audiusTracks.map(track => 
             audiusService.transformTrack(track)
           );
           
-          // Upsert tracks (this requires authentication)
-          const { error: cacheError } = await supabase
-            .from('audius_tracks')
-            .upsert(transformedTracks, { onConflict: 'id' });
+          // Check if user is authenticated before attempting to cache
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user) {
+            // Upsert tracks (requires authentication)
+            const { error: cacheError } = await supabase
+              .from('audius_tracks')
+              .upsert(transformedTracks, { onConflict: 'id' });
 
-          if (cacheError && cacheError.code) {
-            console.warn('Could not cache tracks:', cacheError.message);
+            if (cacheError) {
+              console.warn('Could not cache tracks:', cacheError.message);
+            }
+          } else {
+            console.log('Skipping track caching - user not authenticated');
           }
         }
       } catch (err) {

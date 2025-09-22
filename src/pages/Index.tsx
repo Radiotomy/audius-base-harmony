@@ -14,6 +14,7 @@ import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
 import WalletConnect from '@/components/OnchainWallet';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import { audiusService } from '@/services/audius';
+import { testWithTrendingTrack } from '@/utils/audioStreamTest';
 import heroImage from '@/assets/hero-audiobase.jpg';
 
 const Index = () => {
@@ -43,6 +44,34 @@ const Index = () => {
     
     return Array.from(artistMap.values()).slice(0, 3);
   }, [trendingTracks]);
+
+  // Test audio streaming on component mount (development only)
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      // Automatically test audio streaming when component loads
+      testWithTrendingTrack()
+        .then((result) => {
+          console.log('🎉 Audio streaming test successful:', result);
+        })
+        .catch((error) => {
+          console.error('⚠️  Audio streaming test failed:', error);
+        });
+    }
+  }, []);
+
+  // Test audio streaming on component mount (development only)
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      // Automatically test audio streaming when component loads
+      testWithTrendingTrack()
+        .then((result) => {
+          console.log('🎉 Audio streaming test successful:', result);
+        })
+        .catch((error) => {
+          console.error('⚠️  Audio streaming test failed:', error);
+        });
+    }
+  }, []);
 
   const formatDuration = (seconds: number) => {
     if (!seconds || seconds === 0) return '0:00';

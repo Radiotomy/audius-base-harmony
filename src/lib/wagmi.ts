@@ -1,6 +1,6 @@
 import { http, createConfig } from 'wagmi';
 import { base, mainnet, sepolia } from 'wagmi/chains';
-import { coinbaseWallet, metaMask, walletConnect } from 'wagmi/connectors';
+import { coinbaseWallet, metaMask } from 'wagmi/connectors';
 
 export const config = createConfig({
   chains: [base, mainnet, sepolia],
@@ -10,9 +10,6 @@ export const config = createConfig({
       preference: 'smartWalletOnly', // Use smart wallets by default
     }),
     metaMask(),
-    walletConnect({
-      projectId: 'your-walletconnect-project-id', // Replace with actual project ID
-    }),
   ],
   transports: {
     [base.id]: http(),
