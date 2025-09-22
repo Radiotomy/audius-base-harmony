@@ -53,8 +53,10 @@ const TransactionHistory = () => {
         try {
           const block = await web3.provider.getBlock(latestBlock - i, true);
           if (block && block.transactions) {
-            for (const tx of block.transactions) {
-              if (typeof tx === 'object' && (tx.from === web3.account || tx.to === web3.account)) {
+            const validTransactions = block.transactions.filter(tx => tx && typeof tx === 'object');
+            for (const txData of validTransactions) {
+              if ((txData as any).from === web3.account || (txData as any).to === web3.account) {
+                const tx = txData as any;
                 const receipt = await web3.provider.getTransactionReceipt(tx.hash);
                 
                 transactions.push({

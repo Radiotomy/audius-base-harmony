@@ -153,8 +153,8 @@ export const Web3Provider = ({ children }: Web3ProviderProps) => {
         }
       });
 
-      wcProviderInstance.on('chainChanged', (chainId: number) => {
-        setChainId(chainId);
+      wcProviderInstance.on('chainChanged', (chainId: string) => {
+        setChainId(parseInt(chainId, 16));
       });
 
     } catch (error: any) {

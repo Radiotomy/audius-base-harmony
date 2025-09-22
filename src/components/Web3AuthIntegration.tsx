@@ -34,7 +34,7 @@ const Web3AuthIntegration = () => {
         .eq('user_id', user.id);
 
       if (error) throw error;
-      setBindings(data || []);
+      setBindings((data || []) as WalletBinding[]);
     } catch (error) {
       console.error('Error fetching wallet bindings:', error);
     }
@@ -284,7 +284,7 @@ const Web3AuthIntegration = () => {
               {bindings.map((binding) => (
                 <div key={binding.wallet_address} className="flex items-center justify-between p-2 bg-muted rounded">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" size="sm">
+                    <Badge variant="outline">
                       {binding.wallet_type}
                     </Badge>
                     <code className="text-xs">
