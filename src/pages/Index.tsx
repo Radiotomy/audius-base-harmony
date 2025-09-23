@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Play, TrendingUp, Users, Zap, ExternalLink, ChevronRight, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import AudioPlayer from '@/components/AudioPlayer';
 import ArtistCard from '@/components/ArtistCard';
@@ -193,9 +194,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-foreground">Trending Now</h2>
-            <Button variant="ghost">
-              View All <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
+            <Link to="/trending">
+              <Button variant="ghost">
+                View All <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -308,9 +311,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-foreground">Featured Artists</h2>
-            <Button variant="ghost">
-              Discover More <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
+            <Link to="/artists">
+              <Button variant="ghost">
+                Discover More <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

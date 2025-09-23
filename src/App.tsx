@@ -7,6 +7,8 @@ import { OnchainProvider } from "@/contexts/OnchainKitProvider";
 import { SolanaProvider } from "@/contexts/SolanaContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Trending from "./pages/Trending";
+import Artists from "./pages/Artists";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -20,6 +22,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/trending" element={<Trending />} />
+              <Route path="/artists" element={<Artists />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

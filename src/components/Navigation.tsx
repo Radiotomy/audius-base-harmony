@@ -19,18 +19,38 @@ const Navigation: React.FC = () => {
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-            <span className="text-sm font-bold text-primary-foreground">AB</span>
+        {/* Logo & Navigation */}
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3">
+            <Link to="/">
+              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+                <span className="text-sm font-bold text-primary-foreground">AB</span>
+              </div>
+            </Link>
+            <div>
+              <Link to="/">
+                <h1 className="text-lg font-bold gradient-primary bg-clip-text text-transparent">
+                  AudioBASE
+                </h1>
+              </Link>
+              <p className="text-xs text-muted-foreground -mt-1">
+                Audius × Base
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-bold gradient-primary bg-clip-text text-transparent">
-              AudioBASE
-            </h1>
-            <p className="text-xs text-muted-foreground -mt-1">
-              Audius × Base
-            </p>
+          
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/trending">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Trending
+              </Button>
+            </Link>
+            <Link to="/artists">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Artists
+              </Button>
+            </Link>
           </div>
         </div>
 
