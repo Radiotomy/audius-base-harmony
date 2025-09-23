@@ -289,7 +289,7 @@ const Index = () => {
                       <div className="flex items-center gap-2">
                         <FavoriteButton trackId={track.id} size="sm" />
                         <AddToPlaylistDialog trackId={track.id}>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                             <Plus className="h-4 w-4" />
                           </Button>
                         </AddToPlaylistDialog>

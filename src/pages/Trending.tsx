@@ -152,6 +152,7 @@ const Trending = () => {
                       <Button
                         size="lg"
                         className="h-14 w-14 rounded-full gradient-primary shadow-glow hover:scale-110 transition-transform"
+                        onClick={(e) => { e.stopPropagation(); handleTrackPlay(track); }}
                       >
                         <Play className="h-6 w-6 ml-0.5" />
                       </Button>
@@ -185,7 +186,7 @@ const Trending = () => {
                       <div className="flex items-center gap-1">
                         <FavoriteButton trackId={track.id} size="sm" />
                         <AddToPlaylistDialog trackId={track.id}>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                             <Plus className="h-4 w-4" />
                           </Button>
                         </AddToPlaylistDialog>

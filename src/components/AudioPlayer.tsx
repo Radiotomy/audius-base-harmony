@@ -23,6 +23,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   showQueue = false
 }) => {
   // Fixed: Using List instead of Queue icon
+  const [expanded, setExpanded] = React.useState(false);
   const {
     currentTrack,
     isPlaying,
@@ -84,7 +85,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return null;
   }
 
-  if (isCompact) {
+  if (isCompact && !expanded) {
     return (
       <Card className="fixed bottom-4 left-4 right-4 p-4 shadow-card bg-card/95 backdrop-blur-md border-border z-50">
         <div className="flex items-center gap-4">
@@ -163,8 +164,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 className="w-16"
               />
             </div>
-            {queue.length > 1 && (
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            {queue.length > 0 && (
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setExpanded(true)} aria-label="Open advanced player">
                 <List className="h-3 w-3" />
               </Button>
             )}

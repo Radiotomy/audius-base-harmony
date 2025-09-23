@@ -112,11 +112,10 @@ export const useAudioPlayer = () => {
       console.log('Loading audio stream:', streamUrl, 'for track:', state.currentTrack.title);
       audioRef.current.src = streamUrl;
       audioRef.current.volume = state.volume / 100;
-      
-      // Try to load the audio
+      // Only load when the source changes
       audioRef.current.load();
     }
-  }, [streamUrl, state.currentTrack, state.volume]);
+  }, [streamUrl, state.currentTrack]);
 
   const playTrack = useCallback((track: Track, queue: Track[] = []) => {
     console.log('Playing track:', track.title, 'audiusId:', track.audiusId);
