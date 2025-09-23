@@ -82,15 +82,19 @@ const Index = () => {
   const handleTrackPlay = (track: any) => {
     const artworkUrl = getArtworkUrl(track.artwork);
     
-    setSelectedTrack({
+    const transformedTrack = {
       id: track.id,
       title: track.title,
       artist: track.user?.name || track.artist,
       duration: formatDuration(track.duration || 0),
       cover: artworkUrl,
       audiusId: track.id  // Critical: Add the audiusId field for streaming
-    });
+    };
+    
+    setSelectedTrack(transformedTrack);
     setShowPlayer(true);
+    
+    console.log('Playing track:', transformedTrack.title, 'audiusId:', transformedTrack.audiusId);
   };
 
   return (
@@ -337,8 +341,18 @@ const Index = () => {
 
         {showPlayer && selectedTrack && (
           <AudioPlayer 
+            key={selectedTrack.id} // Force re-render when track changes
             initialTrack={selectedTrack}
+            initialQueue={trendingTracks.map(track => ({
+              id: track.id,
+              title: track.title,
+              artist: track.user?.name || 'Unknown Artist',
+              duration: formatDuration(track.duration || 0),
+              cover: getArtworkUrl(track.artwork),
+              audiusId: track.id
+            }))}
             isCompact 
+            showQueue
           />
         )}
     </div>

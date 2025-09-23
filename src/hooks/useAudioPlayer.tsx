@@ -120,6 +120,13 @@ export const useAudioPlayer = () => {
 
   const playTrack = useCallback((track: Track, queue: Track[] = []) => {
     console.log('Playing track:', track.title, 'audiusId:', track.audiusId);
+    
+    // Stop current audio if playing
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    
     const trackIndex = queue.findIndex(t => t.id === track.id);
     setState(prev => ({
       ...prev,
@@ -127,6 +134,9 @@ export const useAudioPlayer = () => {
       queue: queue.length > 0 ? queue : [track],
       currentIndex: trackIndex >= 0 ? trackIndex : 0,
       isLoading: true,
+      isPlaying: false, // Reset playing state
+      progress: 0,
+      currentTime: 0,
     }));
   }, []);
 
@@ -155,11 +165,19 @@ export const useAudioPlayer = () => {
     const nextIndex = state.currentIndex + 1;
     if (nextIndex < state.queue.length) {
       const nextTrack = state.queue[nextIndex];
+      // Stop current audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       setState(prev => ({
         ...prev,
         currentTrack: nextTrack,
         currentIndex: nextIndex,
         isLoading: true,
+        isPlaying: false,
+        progress: 0,
+        currentTime: 0,
       }));
     } else {
       // End of queue
@@ -171,11 +189,19 @@ export const useAudioPlayer = () => {
     const prevIndex = state.currentIndex - 1;
     if (prevIndex >= 0) {
       const prevTrack = state.queue[prevIndex];
+      // Stop current audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       setState(prev => ({
         ...prev,
         currentTrack: prevTrack,
         currentIndex: prevIndex,
         isLoading: true,
+        isPlaying: false,
+        progress: 0,
+        currentTime: 0,
       }));
     }
   }, [state.currentIndex, state.queue]);

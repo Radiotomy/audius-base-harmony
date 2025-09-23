@@ -46,12 +46,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const { isFavorited, toggleFavorite } = useFavorites();
   const isFav = currentTrack ? isFavorited(currentTrack.id) : false;
 
-  // Initialize with track if provided
+  // Initialize with track if provided, or switch tracks when initialTrack changes
   React.useEffect(() => {
-    if (initialTrack && !currentTrack) {
+    if (initialTrack) {
+      // Always play the new track when initialTrack changes
       playTrack(initialTrack, initialQueue);
     }
-  }, [initialTrack, initialQueue, currentTrack, playTrack]);
+  }, [initialTrack, initialQueue, playTrack]);
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -152,6 +153,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             >
               <Heart className={`h-3 w-3 ${isFav ? 'fill-current' : ''}`} />
             </Button>
+            <div className="flex items-center gap-1 ml-2">
+              <Volume2 className="h-3 w-3 text-muted-foreground" />
+              <Slider
+                value={[volume]}
+                onValueChange={handleVolumeChange}
+                max={100}
+                step={1}
+                className="w-16"
+              />
+            </div>
             {queue.length > 1 && (
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <List className="h-3 w-3" />
