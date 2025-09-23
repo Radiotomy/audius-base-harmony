@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAudiusStreamUrl } from './useAudius';
+import { useWebAudio } from './useWebAudio';
 import { toast } from '@/hooks/use-toast';
 
 export interface Track {
@@ -42,6 +43,9 @@ export const useAudioPlayer = () => {
   const { streamUrl, loading: streamLoading } = useAudiusStreamUrl(
     state.currentTrack?.audiusId || null
   );
+
+  // Initialize Web Audio API for real-time analysis and EQ
+  const webAudio = useWebAudio(audioRef.current);
 
   // Initialize audio element
   useEffect(() => {
@@ -291,5 +295,8 @@ export const useAudioPlayer = () => {
     setVolume,
     addToQueue,
     removeFromQueue,
+    // Web Audio API features
+    webAudio,
+    audioElement: audioRef.current,
   };
 };

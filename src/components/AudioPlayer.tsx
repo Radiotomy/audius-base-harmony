@@ -8,19 +8,22 @@ import { useAudioPlayer, type Track } from '@/hooks/useAudioPlayer';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useFavorites } from '@/hooks/useFavorites';
 import WaveformVisualizer from './WaveformVisualizer';
+import EqualizerControls from './EqualizerControls';
 
 interface AudioPlayerProps {
   initialTrack?: Track;
   initialQueue?: Track[];
   isCompact?: boolean;
   showQueue?: boolean;
+  showEqualizer?: boolean;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ 
   initialTrack,
   initialQueue = [],
   isCompact = false,
-  showQueue = false
+  showQueue = false,
+  showEqualizer = false
 }) => {
   // Fixed: Using List instead of Queue icon
   const [expanded, setExpanded] = React.useState(false);
@@ -42,6 +45,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     setVolume,
     addToQueue,
     removeFromQueue,
+    webAudio,
   } = useAudioPlayer();
 
   const { isFavorited, toggleFavorite } = useFavorites();
@@ -110,7 +114,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
               <span className="text-xs text-muted-foreground">by {currentTrack.artist}</span>
             </div>
             <div className="relative">
-              <WaveformVisualizer isPlaying={isPlaying} className="h-6" />
+              <WaveformVisualizer 
+                isPlaying={isPlaying} 
+                className="h-6" 
+                analyserData={webAudio.analyserData}
+              />
               <div className="absolute inset-0 flex items-center">
                 <Slider
                   value={[progress]}
@@ -201,7 +209,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
         {/* Waveform */}
         <div className="flex justify-center">
-          <WaveformVisualizer isPlaying={isPlaying} />
+          <WaveformVisualizer 
+            isPlaying={isPlaying} 
+            analyserData={webAudio.analyserData}
+          />
         </div>
 
         {/* Progress */}
@@ -290,6 +301,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             )}
           </div>
         </div>
+
+        {/* Equalizer */}
+        {showEqualizer && webAudio.isInitialized && (
+          <div className="border-t pt-4">
+            <EqualizerControls
+              eqBands={webAudio.eqBands}
+              onGainChange={webAudio.setEQGain}
+              onReset={webAudio.resetEQ}
+            />
+          </div>
+        )}
 
         {/* Queue Preview */}
         {showQueue && queue.length > 1 && (

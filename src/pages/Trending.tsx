@@ -215,6 +215,7 @@ const Trending = () => {
           }))}
           isCompact 
           showQueue
+          showEqualizer={true}
         />
       )}
     </div>

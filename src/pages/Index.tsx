@@ -348,6 +348,7 @@ const Index = () => {
             }))}
             isCompact 
             showQueue
+            showEqualizer={true}
           />
         )}
     </div>
