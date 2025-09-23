@@ -128,7 +128,12 @@ const Index = () => {
               <Button 
                 size="lg"
                 className="gradient-primary hover:scale-105 transition-bounce shadow-glow px-8 py-6 text-lg"
-                onClick={() => setShowPlayer(true)}
+                onClick={() => {
+                  if (trendingTracks.length > 0) {
+                    handleTrackPlay(trendingTracks[0]);
+                  }
+                }}
+                disabled={trendingTracks.length === 0}
               >
                 <Play className="h-5 w-5 mr-2" />
                 Start Listening
@@ -216,40 +221,80 @@ const Index = () => {
               trendingTracks.slice(0, 6).map((track, index) => (
                 <Card 
                   key={track.id} 
-                  className="p-6 shadow-card bg-card hover:shadow-glow transition-smooth group cursor-pointer"
+                  className="overflow-hidden shadow-card bg-card hover:shadow-glow transition-smooth group cursor-pointer"
                   onClick={() => handleTrackPlay(track)}
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="text-2xl font-bold text-muted-foreground">
+                  {/* Track Artwork */}
+                  <div className="relative">
+                    {getArtworkUrl(track.artwork) ? (
+                      <img
+                        src={getArtworkUrl(track.artwork)}
+                        alt={track.title}
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-48 bg-muted flex items-center justify-center"><div class="text-4xl">🎵</div></div>';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-48 bg-muted flex items-center justify-center">
+                        <div className="text-4xl">🎵</div>
+                      </div>
+                    )}
+                    
+                    {/* Rank Badge */}
+                    <div className="absolute top-3 left-3 bg-black/70 text-white text-sm font-bold px-3 py-1 rounded-full backdrop-blur-sm">
                       #{index + 1}
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-smooth line-clamp-1">
-                        {track.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-1">{track.user.name}</p>
+                    
+                    {/* Play Count Badge */}
+                    <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                      {track.play_count?.toLocaleString() || '0'} plays
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-smooth">
-                      <Button size="sm" className="gradient-primary">
-                        <Play className="h-3 w-3" />
+                    
+                    {/* Play Button Overlay */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button
+                        size="lg"
+                        className="h-14 w-14 rounded-full gradient-primary shadow-glow hover:scale-110 transition-transform"
+                      >
+                        <Play className="h-6 w-6 ml-0.5" />
                       </Button>
-                      <FavoriteButton trackId={track.id} />
-                      <AddToPlaylistDialog trackId={track.id}>
-                        <Button variant="ghost" size="sm">
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </AddToPlaylistDialog>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="text-muted-foreground">
-                      <span className="mr-3">{track.play_count?.toLocaleString() || '0'} plays</span>
-                      <span>{formatDuration(track.duration || 0)}</span>
+
+                  {/* Track Info */}
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-smooth line-clamp-1">
+                          {track.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm line-clamp-1">
+                          by {track.user.name}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 ml-2">
+                        <span className="text-xs text-muted-foreground">
+                          {formatDuration(track.duration || 0)}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-accent font-medium">
-                      🎵 Audius
-                    </span>
+                    
+                    {/* Actions */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FavoriteButton trackId={track.id} size="sm" />
+                        <AddToPlaylistDialog trackId={track.id}>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </AddToPlaylistDialog>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className="text-accent font-medium">🎵 Audius</span>
+                      </div>
+                    </div>
                   </div>
                 </Card>
               ))
