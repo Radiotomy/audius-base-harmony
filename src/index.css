@@ -191,6 +191,32 @@ All colors MUST be HSL.
     }
   }
   
+  @keyframes frequency-spectrum {
+    0% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1.2); }
+    100% { transform: scaleY(0.6); }
+  }
+  
+  @keyframes circular-pulse {
+    0% { transform: scale(0.8); opacity: 0.4; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(0.9); opacity: 0.6; }
+  }
+  
+  @keyframes line-wave {
+    0% { transform: translateY(0px) scaleY(0.5); }
+    25% { transform: translateY(-4px) scaleY(0.8); }
+    50% { transform: translateY(-2px) scaleY(1); }
+    75% { transform: translateY(-6px) scaleY(0.7); }
+    100% { transform: translateY(0px) scaleY(0.5); }
+  }
+  
+  @keyframes beat-dots {
+    0% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0.5; transform: scale(1); }
+  }
+  
   @keyframes pulse-glow {
     0%, 100% {
       box-shadow: 0 0 20px hsl(var(--base-blue) / 0.3);
