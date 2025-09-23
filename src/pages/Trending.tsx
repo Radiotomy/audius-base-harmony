@@ -43,7 +43,7 @@ const Trending = () => {
     const transformedTrack = {
       id: track.id,
       title: track.title,
-      artist: track.user?.name || track.artist,
+      artist: track.user?.name || 'Unknown Artist',
       duration: formatDuration(track.duration || 0),
       cover: artworkUrl,
       audiusId: track.id

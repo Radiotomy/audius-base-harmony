@@ -50,8 +50,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   // Initialize with track if provided, or switch tracks when initialTrack changes
   React.useEffect(() => {
     if (initialTrack) {
-      // Always play the new track when initialTrack changes
-      playTrack(initialTrack, initialQueue);
+      // Auto-play the new track when initialTrack changes
+      playTrack(initialTrack, initialQueue, true);
     }
   }, [initialTrack, initialQueue, playTrack]);
 

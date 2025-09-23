@@ -21,6 +21,7 @@ export interface AudioPlayerState {
   queue: Track[];
   currentIndex: number;
   isLoading: boolean;
+  shouldAutoPlay: boolean;
 }
 
 export const useAudioPlayer = () => {
@@ -29,12 +30,13 @@ export const useAudioPlayer = () => {
     currentTrack: null,
     isPlaying: false,
     progress: 0,
-    volume: 80,
+    volume: 70,
     duration: 0,
     currentTime: 0,
     queue: [],
     currentIndex: -1,
     isLoading: false,
+    shouldAutoPlay: false,
   });
 
   const { streamUrl, loading: streamLoading } = useAudiusStreamUrl(
@@ -85,8 +87,21 @@ export const useAudioPlayer = () => {
       setState(prev => ({ ...prev, isLoading: true }));
     };
 
-    const handleCanPlay = () => {
-      setState(prev => ({ ...prev, isLoading: false }));
+    const handleCanPlay = async () => {
+      console.log('Audio can play');
+      setState(prev => {
+        const newState = { ...prev, isLoading: false };
+        // Auto-play if requested
+        if (prev.shouldAutoPlay && audioRef.current) {
+          audioRef.current.play().then(() => {
+            setState(current => ({ ...current, isPlaying: true, shouldAutoPlay: false }));
+          }).catch((error) => {
+            console.error('Auto-play failed:', error);
+            setState(current => ({ ...current, shouldAutoPlay: false }));
+          });
+        }
+        return newState;
+      });
     };
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -117,7 +132,7 @@ export const useAudioPlayer = () => {
     }
   }, [streamUrl, state.currentTrack]);
 
-  const playTrack = useCallback((track: Track, queue: Track[] = []) => {
+  const playTrack = useCallback((track: Track, queue: Track[] = [], autoPlay: boolean = true) => {
     console.log('Playing track:', track.title, 'audiusId:', track.audiusId);
     
     // Stop current audio if playing
@@ -133,9 +148,10 @@ export const useAudioPlayer = () => {
       queue: queue.length > 0 ? queue : [track],
       currentIndex: trackIndex >= 0 ? trackIndex : 0,
       isLoading: true,
-      isPlaying: false, // Reset playing state
+      isPlaying: false, // Will be set to true when audio loads if autoPlay is true
       progress: 0,
       currentTime: 0,
+      shouldAutoPlay: autoPlay, // Store autoPlay intent
     }));
   }, []);
 
@@ -177,6 +193,7 @@ export const useAudioPlayer = () => {
         isPlaying: false,
         progress: 0,
         currentTime: 0,
+        shouldAutoPlay: true, // Auto-play next track
       }));
     } else {
       // End of queue
@@ -201,6 +218,7 @@ export const useAudioPlayer = () => {
         isPlaying: false,
         progress: 0,
         currentTime: 0,
+        shouldAutoPlay: true, // Auto-play previous track
       }));
     }
   }, [state.currentIndex, state.queue]);
