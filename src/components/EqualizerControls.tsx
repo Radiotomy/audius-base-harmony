@@ -23,8 +23,8 @@ const EqualizerControls: React.FC<EqualizerControlsProps> = ({
   };
 
   return (
-    <div className="w-full bg-card/50 rounded-lg p-4 border border-border/50">
-      <div className="flex items-center justify-between mb-4">
+    <div className="w-full bg-card/50 rounded-lg p-3 border border-border/50">
+      <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-medium">10-Band Equalizer</h4>
         <Button
           onClick={onReset}
@@ -37,13 +37,13 @@ const EqualizerControls: React.FC<EqualizerControlsProps> = ({
         </Button>
       </div>
       
-      <div className="flex items-end justify-between gap-2 h-32">
+      <div className="flex items-end justify-between gap-1 h-24">
         {eqBands.map((band, index) => (
-          <div key={band.frequency} className="flex flex-col items-center gap-2 flex-1">
-            <div className="text-xs text-muted-foreground font-mono min-w-0">
+          <div key={band.frequency} className="flex flex-col items-center gap-1 flex-1 min-w-0">
+            <div className="text-xs text-muted-foreground font-mono truncate text-center w-full">
               {formatFrequency(band.frequency)}
             </div>
-            <div className="h-20 flex items-end">
+            <div className="h-16 flex items-end">
               <Slider
                 value={[band.gain]}
                 onValueChange={(values) => onGainChange(index, values[0])}
@@ -54,14 +54,14 @@ const EqualizerControls: React.FC<EqualizerControlsProps> = ({
                 className="h-full"
               />
             </div>
-            <div className="text-xs text-muted-foreground font-mono w-8 text-center">
+            <div className="text-xs text-muted-foreground font-mono text-center w-full truncate">
               {band.gain >= 0 ? '+' : ''}{band.gain.toFixed(1)}
             </div>
           </div>
         ))}
       </div>
       
-      <div className="flex justify-between text-xs text-muted-foreground mt-2 px-1">
+      <div className="flex justify-between text-xs text-muted-foreground mt-1 px-1">
         <span>-12dB</span>
         <span>0dB</span>
         <span>+12dB</span>

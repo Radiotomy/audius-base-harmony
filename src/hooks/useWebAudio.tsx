@@ -44,6 +44,11 @@ export const useWebAudio = (audioElement: HTMLAudioElement | null) => {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       audioContextRef.current = audioContext;
 
+      // Resume context if suspended (required for some browsers)
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
       // Create source from audio element
       const source = audioContext.createMediaElementSource(audioElement);
       sourceRef.current = source;
@@ -75,9 +80,11 @@ export const useWebAudio = (audioElement: HTMLAudioElement | null) => {
       previousNode.connect(analyser);
       analyser.connect(audioContext.destination);
 
+      console.log('✅ Web Audio API initialized successfully');
       setState(prev => ({ ...prev, isInitialized: true }));
     } catch (error) {
-      console.error('Failed to initialize Web Audio API:', error);
+      console.error('❌ Failed to initialize Web Audio API:', error);
+      // Don't set isInitialized to true on error - this allows fallback to normal audio
     }
   }, [audioElement, state.isInitialized]);
 
@@ -114,21 +121,35 @@ export const useWebAudio = (audioElement: HTMLAudioElement | null) => {
     }));
   }, []);
 
-  // Initialize when audio element is available
+  // Initialize when audio element is available and user starts playback
   useEffect(() => {
     if (audioElement && !state.isInitialized) {
-      initializeWebAudio();
+      // Only initialize Web Audio API when user interacts (required for autoplay policies)
+      const initOnFirstPlay = () => {
+        initializeWebAudio();
+        audioElement.removeEventListener('play', initOnFirstPlay);
+      };
+      
+      audioElement.addEventListener('play', initOnFirstPlay);
+      
+      return () => {
+        audioElement.removeEventListener('play', initOnFirstPlay);
+      };
     }
   }, [audioElement, initializeWebAudio, state.isInitialized]);
 
   // Start/stop analyser updates based on audio playback
   useEffect(() => {
-    if (state.isInitialized && audioElement) {
-      const handlePlay = () => {
-        if (audioContextRef.current?.state === 'suspended') {
-          audioContextRef.current.resume();
+    if (state.isInitialized && audioElement && audioContextRef.current) {
+      const handlePlay = async () => {
+        try {
+          if (audioContextRef.current?.state === 'suspended') {
+            await audioContextRef.current.resume();
+          }
+          updateAnalyserData();
+        } catch (error) {
+          console.error('Error resuming audio context:', error);
         }
-        updateAnalyserData();
       };
 
       const handlePause = () => {
