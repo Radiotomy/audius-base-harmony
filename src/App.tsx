@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { OnchainProvider } from "@/contexts/OnchainKitProvider";
 import { SolanaProvider } from "@/contexts/SolanaContext";
+import { PlayerProvider } from "@/contexts/PlayerContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Trending from "./pages/Trending";
@@ -15,20 +16,22 @@ const App = () => (
   <AuthProvider>
     <OnchainProvider>
       <SolanaProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/trending" element={<Trending />} />
-              <Route path="/artists" element={<Artists />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <PlayerProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/trending" element={<Trending />} />
+                <Route path="/artists" element={<Artists />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </PlayerProvider>
       </SolanaProvider>
     </OnchainProvider>
   </AuthProvider>

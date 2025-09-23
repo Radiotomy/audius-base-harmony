@@ -5,6 +5,7 @@ import { Play, Heart, MoreHorizontal } from 'lucide-react';
 import FavoriteButton from './FavoriteButton';
 import AddToPlaylistDialog from './AddToPlaylistDialog';
 import { useAuth } from '@/hooks/useAuth';
+import { usePlayer } from '@/contexts/PlayerContext';
 
 interface TrackCardProps {
   track: {
@@ -21,6 +22,7 @@ interface TrackCardProps {
 
 const TrackCard: React.FC<TrackCardProps> = ({ track, onPlay, className }) => {
   const { user } = useAuth();
+  const player = usePlayer();
   
   const formatPlayCount = (count?: number) => {
     if (!count) return '0';
@@ -34,6 +36,19 @@ const TrackCard: React.FC<TrackCardProps> = ({ track, onPlay, className }) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleDirectPlay = async () => {
+    const transformedTrack = {
+      id: track.id,
+      title: track.title,
+      artist: track.user?.name || 'Unknown Artist',
+      duration: formatDuration(track.duration),
+      cover: track.artwork?.['480x480'] || track.artwork?.['150x150'],
+      audiusId: track.id,
+    };
+    
+    await player.play(transformedTrack, [transformedTrack], true);
   };
 
   return (
@@ -50,7 +65,7 @@ const TrackCard: React.FC<TrackCardProps> = ({ track, onPlay, className }) => {
         {/* Play Button Overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <Button
-            onClick={() => onPlay?.(track)}
+            onClick={() => onPlay ? onPlay(track) : handleDirectPlay()}
             size="lg"
             className="h-14 w-14 rounded-full gradient-primary shadow-glow hover:scale-110 transition-transform"
           >
@@ -95,7 +110,7 @@ const TrackCard: React.FC<TrackCardProps> = ({ track, onPlay, className }) => {
             </div>
             
             <Button
-              onClick={() => onPlay?.(track)}
+              onClick={() => onPlay ? onPlay(track) : handleDirectPlay()}
               variant="ghost"
               size="sm"
               className="text-primary hover:text-primary/80"

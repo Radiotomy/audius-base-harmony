@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 // Force refresh by updating import
 import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Share, List, MoreHorizontal } from 'lucide-react';
-import { useAudioPlayer, type Track } from '@/hooks/useAudioPlayer';
+import { usePlayer, type Track } from '@/contexts/PlayerContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useFavorites } from '@/hooks/useFavorites';
 import WaveformVisualizer from './WaveformVisualizer';
@@ -37,7 +37,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     queue,
     currentIndex,
     isLoading,
-    playTrack,
+    play,
     togglePlay,
     next,
     previous,
@@ -46,7 +46,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     addToQueue,
     removeFromQueue,
     webAudio,
-  } = useAudioPlayer();
+  } = usePlayer();
 
   const { isFavorited, toggleFavorite } = useFavorites();
   const isFav = currentTrack ? isFavorited(currentTrack.id) : false;
@@ -55,9 +55,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   React.useEffect(() => {
     if (initialTrack) {
       // Auto-play the new track when initialTrack changes
-      playTrack(initialTrack, initialQueue, true);
+      play(initialTrack, initialQueue, true);
     }
-  }, [initialTrack, initialQueue, playTrack]);
+  }, [initialTrack, initialQueue, play]);
 
   // Keyboard shortcuts
   useKeyboardShortcuts({

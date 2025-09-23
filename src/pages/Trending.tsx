@@ -9,11 +9,12 @@ import AudioPlayer from '@/components/AudioPlayer';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
+import { usePlayer } from '@/contexts/PlayerContext';
 import { Link } from 'react-router-dom';
 
 const Trending = () => {
   const [showPlayer, setShowPlayer] = useState(false);
-  const [selectedTrack, setSelectedTrack] = useState<any>(null);
+  const player = usePlayer();
   
   // Fetch more trending tracks
   const { tracks: trendingTracks, loading: tracksLoading } = useAudiusTrendingTracks(20);
@@ -37,19 +38,28 @@ const Trending = () => {
     return null;
   };
 
-  const handleTrackPlay = (track: any) => {
-    const artworkUrl = getArtworkUrl(track.artwork);
-    
+  // Transform track data and handle play
+  const handleTrackPlay = async (track: any) => {
     const transformedTrack = {
       id: track.id,
       title: track.title,
       artist: track.user?.name || 'Unknown Artist',
       duration: formatDuration(track.duration || 0),
-      cover: artworkUrl,
-      audiusId: track.id
+      cover: getArtworkUrl(track.artwork),
+      audiusId: track.id,
     };
-    
-    setSelectedTrack(transformedTrack);
+
+    // Transform entire queue for context
+    const transformedQueue = trendingTracks.map(t => ({
+      id: t.id,
+      title: t.title,
+      artist: t.user?.name || 'Unknown Artist',
+      duration: formatDuration(t.duration || 0),
+      cover: getArtworkUrl(t.artwork),
+      audiusId: t.id,
+    }));
+
+    await player.play(transformedTrack, transformedQueue, true);
     setShowPlayer(true);
   };
 
@@ -201,20 +211,8 @@ const Trending = () => {
       </section>
 
       {/* Audio Player */}
-      {showPlayer && selectedTrack && (
-        <AudioPlayer 
-          key={selectedTrack.id}
-          initialTrack={selectedTrack}
-          initialQueue={trendingTracks.map(track => ({
-            id: track.id,
-            title: track.title,
-            artist: track.user?.name || 'Unknown Artist',
-            duration: formatDuration(track.duration || 0),
-            cover: getArtworkUrl(track.artwork),
-            audiusId: track.id
-          }))}
-          isCompact 
-          showQueue
+      {showPlayer && player.currentTrack && (
+        <AudioPlayer
           showEqualizer={true}
         />
       )}

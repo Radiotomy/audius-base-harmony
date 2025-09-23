@@ -3,6 +3,8 @@ import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import TrackCard from '@/components/TrackCard';
 import ArtistCard from '@/components/ArtistCard';
 import AudioPlayer from '@/components/AudioPlayer';
+import { useAuth } from '@/hooks/useAuth';
+import { usePlayer } from '@/contexts/PlayerContext';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
 import { Button } from '@/components/ui/button';
@@ -10,15 +12,14 @@ import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus } from 'lucide-react';
 import { testWithTrendingTrack } from '@/utils/audioStreamTest';
-import { useAuth } from '@/hooks/useAuth';
 import Navigation from '@/components/Navigation';
 import React from 'react';
 
 const Index = () => {
-  const [selectedTrack, setSelectedTrack] = React.useState<any>(null);
   const [showPlayer, setShowPlayer] = React.useState(false);
-  const { tracks: trendingTracks, loading, error } = useAudiusTrendingTracks(6);
   const { user } = useAuth();
+  const player = usePlayer();
+  const { tracks: trendingTracks, loading, error } = useAudiusTrendingTracks(6);
 
   // Get top 3 artists from trending tracks
   const featuredArtists = React.useMemo(() => {
@@ -73,19 +74,28 @@ const Index = () => {
     return null;
   };
 
-  const handleTrackPlay = (track: any) => {
-    const artworkUrl = getArtworkUrl(track.artwork);
-    
+  // Transform track data and handle play
+  const handleTrackPlay = async (track: any) => {
     const transformedTrack = {
       id: track.id,
       title: track.title,
       artist: track.user?.name || track.artist,
       duration: formatDuration(track.duration || 0),
-      cover: artworkUrl,
-      audiusId: track.id  // Critical: Add the audiusId field for streaming
+      cover: getArtworkUrl(track.artwork),
+      audiusId: track.id,
     };
-    
-    setSelectedTrack(transformedTrack);
+
+    // Transform entire queue for context
+    const transformedQueue = trendingTracks.map(t => ({
+      id: t.id,
+      title: t.title,
+      artist: t.user?.name || 'Unknown Artist',
+      duration: formatDuration(t.duration || 0),
+      cover: getArtworkUrl(t.artwork),
+      audiusId: t.id,
+    }));
+
+    await player.play(transformedTrack, transformedQueue, true);
     setShowPlayer(true);
   };
 
@@ -334,20 +344,9 @@ const Index = () => {
         </div>
       </section>
 
-        {showPlayer && selectedTrack && (
-          <AudioPlayer 
-            key={selectedTrack.id} // Force re-render when track changes
-            initialTrack={selectedTrack}
-            initialQueue={trendingTracks.map(track => ({
-              id: track.id,
-              title: track.title,
-              artist: track.user?.name || 'Unknown Artist',
-              duration: formatDuration(track.duration || 0),
-              cover: getArtworkUrl(track.artwork),
-              audiusId: track.id
-            }))}
-            isCompact 
-            showQueue
+        {/* Audio Player */}
+        {showPlayer && player.currentTrack && (
+          <AudioPlayer
             showEqualizer={true}
           />
         )}
