@@ -1,4 +1,5 @@
-import { Play, Heart, Users, TrendingUp, Zap } from 'lucide-react';
+import React from 'react';
+import { Play, Heart, Users, TrendingUp, Zap, Plus } from 'lucide-react';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import TrackCard from '@/components/TrackCard';
 import ArtistCard from '@/components/ArtistCard';
@@ -10,10 +11,8 @@ import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus } from 'lucide-react';
 import { testWithTrendingTrack } from '@/utils/audioStreamTest';
 import Navigation from '@/components/Navigation';
-import React from 'react';
 
 const Index = () => {
   const [showPlayer, setShowPlayer] = React.useState(false);
