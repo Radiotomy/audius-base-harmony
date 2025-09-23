@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      artist_tips: {
+        Row: {
+          amount: number
+          artist_id: string
+          artist_name: string
+          artist_wallet_address: string | null
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          message: string | null
+          status: string
+          transaction_hash: string | null
+          user_id: string
+          wallet_address: string
+        }
+        Insert: {
+          amount: number
+          artist_id: string
+          artist_name: string
+          artist_wallet_address?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          currency: string
+          id?: string
+          message?: string | null
+          status?: string
+          transaction_hash?: string | null
+          user_id: string
+          wallet_address: string
+        }
+        Update: {
+          amount?: number
+          artist_id?: string
+          artist_name?: string
+          artist_wallet_address?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          message?: string | null
+          status?: string
+          transaction_hash?: string | null
+          user_id?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       audius_tracks: {
         Row: {
           artist_id: string

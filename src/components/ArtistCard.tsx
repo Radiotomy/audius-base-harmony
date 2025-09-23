@@ -18,7 +18,7 @@ interface Artist {
 interface ArtistCardProps {
   artist: Artist;
   onPlay?: () => void;
-  onTip?: () => void;
+  onTip?: (artist: Artist) => void;
 }
 
 const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip }) => {
@@ -72,7 +72,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip }) => {
             Play
           </Button>
           <Button 
-            onClick={onTip}
+            onClick={() => onTip?.(artist)}
             variant="outline" 
             size="sm"
             className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-smooth"

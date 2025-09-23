@@ -7,11 +7,14 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, Search, Users, Music, ExternalLink } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import ArtistCard from '@/components/ArtistCard';
+import TipArtistDialog from '@/components/TipArtistDialog';
 import { useAudiusTrendingTracks, useAudiusSearch } from '@/hooks/useAudius';
 import { Link } from 'react-router-dom';
 
 const Artists = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedArtist, setSelectedArtist] = useState<any>(null);
+  const [showTipDialog, setShowTipDialog] = useState(false);
   
   // Fetch trending tracks to extract artists
   const { tracks: trendingTracks, loading: tracksLoading } = useAudiusTrendingTracks(50);
@@ -55,9 +58,9 @@ const Artists = () => {
     // This would integrate with the audio player
   };
 
-  const handleArtistTip = (artistId: string) => {
-    console.log('Tipping artist:', artistId);
-    // This would open the tipping interface
+  const handleArtistTip = (artist: any) => {
+    setSelectedArtist(artist);
+    setShowTipDialog(true);
   };
 
   const displayedArtists = searchQuery.trim() ? searchResults.users : featuredArtists;
@@ -215,7 +218,7 @@ const Artists = () => {
                       <Button
                         size="sm"
                         className="gradient-primary"
-                        onClick={() => handleArtistTip(artist.id)}
+                        onClick={() => handleArtistTip(artist)}
                       >
                         💎 Tip
                       </Button>
@@ -246,6 +249,13 @@ const Artists = () => {
           </div>
         </div>
       </section>
+
+      {/* Tip Artist Dialog */}
+      <TipArtistDialog
+        open={showTipDialog}
+        onOpenChange={setShowTipDialog}
+        artist={selectedArtist || { id: '', name: '' }}
+      />
     </div>
   );
 };
