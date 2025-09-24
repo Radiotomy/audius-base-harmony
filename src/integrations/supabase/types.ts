@@ -762,6 +762,7 @@ export type Database = {
         Row: {
           buyer_address: string | null
           created_at: string
+          created_by: string | null
           currency: string
           expires_at: string | null
           id: string
@@ -774,6 +775,7 @@ export type Database = {
         Insert: {
           buyer_address?: string | null
           created_at?: string
+          created_by?: string | null
           currency?: string
           expires_at?: string | null
           id?: string
@@ -786,6 +788,7 @@ export type Database = {
         Update: {
           buyer_address?: string | null
           created_at?: string
+          created_by?: string | null
           currency?: string
           expires_at?: string | null
           id?: string

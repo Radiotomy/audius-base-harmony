@@ -48,6 +48,7 @@ export interface NFTListing {
   created_at: string;
   sold_at?: string;
   buyer_address?: string;
+  created_by?: string;
 }
 
 export const useNFTCollections = () => {
@@ -182,6 +183,7 @@ export const useNFTTokens = (collectionId?: string) => {
 export const useNFTListings = () => {
   const [listings, setListings] = useState<NFTListing[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   const { toast } = useToast();
 
   const fetchListings = async () => {
@@ -206,11 +208,11 @@ export const useNFTListings = () => {
     }
   };
 
-  const createListing = async (data: Omit<NFTListing, 'id' | 'created_at' | 'sold_at' | 'buyer_address'>) => {
+  const createListing = async (data: Omit<NFTListing, 'id' | 'created_at' | 'sold_at' | 'buyer_address' | 'created_by'>) => {
     try {
       const { error } = await supabase
         .from('nft_listings')
-        .insert([data]);
+        .insert([{ ...data, created_by: user?.id }]);
 
       if (error) throw error;
       
