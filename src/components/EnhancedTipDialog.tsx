@@ -19,6 +19,7 @@ import { Transaction, TransactionButton, TransactionSponsor, TransactionStatus, 
 import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
 import { parseEther } from 'viem';
 import { supabase } from '@/integrations/supabase/client';
+import { useContractAddresses } from '@/hooks/useContractAddresses';
 
 interface Artist {
   id: string;
@@ -34,8 +35,6 @@ interface EnhancedTipDialogProps {
   artist: Artist;
 }
 
-const ARTIST_TIP_CONTRACT = '0x0000000000000000000000000000000000000000'; // Replace with actual contract address
-
 export const EnhancedTipDialog: React.FC<EnhancedTipDialogProps> = ({
   open,
   onOpenChange,
@@ -45,6 +44,7 @@ export const EnhancedTipDialog: React.FC<EnhancedTipDialogProps> = ({
   const [message, setMessage] = useState('');
   const { toast } = useToast();
   const { address, isConnected } = useAccount();
+  const { artistTippingAddress } = useContractAddresses();
 
   const predefinedAmounts = ['0.001', '0.005', '0.01', '0.05'];
 
@@ -101,9 +101,9 @@ export const EnhancedTipDialog: React.FC<EnhancedTipDialogProps> = ({
 
   const contracts = [
     {
-      address: ARTIST_TIP_CONTRACT,
+      address: artistTippingAddress,
       functionName: 'tipArtist',
-      args: [artist.wallet_address || artist.id, message],
+      args: [artist.wallet_address || artist.id, message, `tip_${Date.now()}`],
       value: parseEther(amount || '0'),
     },
   ];

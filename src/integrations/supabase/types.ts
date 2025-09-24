@@ -467,6 +467,48 @@ export type Database = {
           },
         ]
       }
+      contract_deployments: {
+        Row: {
+          block_number: number
+          contract_address: string
+          contract_name: string
+          created_at: string
+          deployed_at: string
+          deployer_address: string
+          gas_used: number
+          id: string
+          network: string
+          transaction_hash: string
+          updated_at: string
+        }
+        Insert: {
+          block_number: number
+          contract_address: string
+          contract_name: string
+          created_at?: string
+          deployed_at?: string
+          deployer_address: string
+          gas_used: number
+          id?: string
+          network?: string
+          transaction_hash: string
+          updated_at?: string
+        }
+        Update: {
+          block_number?: number
+          contract_address?: string
+          contract_name?: string
+          created_at?: string
+          deployed_at?: string
+          deployer_address?: string
+          gas_used?: number
+          id?: string
+          network?: string
+          transaction_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_streams: {
         Row: {
           backup_stream_url: string | null

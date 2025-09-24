@@ -20,6 +20,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardProfile from "./pages/DashboardProfile";
 import { ArtistRegistration } from "./pages/ArtistRegistration";
 import WalletDashboard from "./pages/WalletDashboard";
+import ContractDashboard from "./pages/ContractDashboard";
 import { ArtistEarnings } from "./pages/ArtistEarnings";
 import NFTMarketplace from "./pages/NFTMarketplace";
 import NFTStudio from "./pages/NFTStudio";
@@ -66,6 +67,11 @@ const App = () => (
                       <Route path="/wallet" element={
                         <ProtectedRoute>
                           <WalletDashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/contracts" element={
+                        <ProtectedRoute>
+                          <ContractDashboard />
                         </ProtectedRoute>
                       } />
                       <Route path="/artist-earnings" element={
