@@ -467,6 +467,207 @@ export type Database = {
           },
         ]
       }
+      event_streams: {
+        Row: {
+          backup_stream_url: string | null
+          chat_enabled: boolean | null
+          created_at: string
+          ended_at: string | null
+          event_id: string
+          id: string
+          is_live: boolean | null
+          max_viewers: number | null
+          recording_enabled: boolean | null
+          recording_url: string | null
+          started_at: string | null
+          stream_key: string | null
+          stream_url: string | null
+          viewer_count: number | null
+        }
+        Insert: {
+          backup_stream_url?: string | null
+          chat_enabled?: boolean | null
+          created_at?: string
+          ended_at?: string | null
+          event_id: string
+          id?: string
+          is_live?: boolean | null
+          max_viewers?: number | null
+          recording_enabled?: boolean | null
+          recording_url?: string | null
+          started_at?: string | null
+          stream_key?: string | null
+          stream_url?: string | null
+          viewer_count?: number | null
+        }
+        Update: {
+          backup_stream_url?: string | null
+          chat_enabled?: boolean | null
+          created_at?: string
+          ended_at?: string | null
+          event_id?: string
+          id?: string
+          is_live?: boolean | null
+          max_viewers?: number | null
+          recording_enabled?: boolean | null
+          recording_url?: string | null
+          started_at?: string | null
+          stream_key?: string | null
+          stream_url?: string | null
+          viewer_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_streams_event"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_tickets: {
+        Row: {
+          currency: string
+          event_id: string
+          id: string
+          metadata: Json | null
+          price: number
+          purchase_hash: string | null
+          purchased_at: string
+          qr_code: string | null
+          status: string
+          ticket_number: string | null
+          ticket_type: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          currency?: string
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          price: number
+          purchase_hash?: string | null
+          purchased_at?: string
+          qr_code?: string | null
+          status?: string
+          ticket_number?: string | null
+          ticket_type?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          currency?: string
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          price?: number
+          purchase_hash?: string | null
+          purchased_at?: string
+          qr_code?: string | null
+          status?: string
+          ticket_number?: string | null
+          ticket_type?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_tickets_event"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          age_restriction: string | null
+          artist_id: string
+          cover_image_url: string | null
+          created_at: string
+          current_attendance: number | null
+          description: string | null
+          door_time: string | null
+          end_time: string | null
+          event_date: string
+          event_type: string
+          genre: string | null
+          id: string
+          is_virtual: boolean | null
+          max_capacity: number | null
+          metadata: Json | null
+          start_time: string | null
+          status: string
+          stream_url: string | null
+          tags: string[] | null
+          ticket_price: number | null
+          title: string
+          updated_at: string
+          venue_id: string | null
+        }
+        Insert: {
+          age_restriction?: string | null
+          artist_id: string
+          cover_image_url?: string | null
+          created_at?: string
+          current_attendance?: number | null
+          description?: string | null
+          door_time?: string | null
+          end_time?: string | null
+          event_date: string
+          event_type?: string
+          genre?: string | null
+          id?: string
+          is_virtual?: boolean | null
+          max_capacity?: number | null
+          metadata?: Json | null
+          start_time?: string | null
+          status?: string
+          stream_url?: string | null
+          tags?: string[] | null
+          ticket_price?: number | null
+          title: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Update: {
+          age_restriction?: string | null
+          artist_id?: string
+          cover_image_url?: string | null
+          created_at?: string
+          current_attendance?: number | null
+          description?: string | null
+          door_time?: string | null
+          end_time?: string | null
+          event_date?: string
+          event_type?: string
+          genre?: string | null
+          id?: string
+          is_virtual?: boolean | null
+          max_capacity?: number | null
+          metadata?: Json | null
+          start_time?: string | null
+          status?: string
+          stream_url?: string | null
+          tags?: string[] | null
+          ticket_price?: number | null
+          title?: string
+          updated_at?: string
+          venue_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_events_venue"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nft_collections: {
         Row: {
           artist_id: string
@@ -969,6 +1170,63 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      venues: {
+        Row: {
+          address: string | null
+          capacity: number | null
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          updated_at?: string
+          website_url?: string | null
         }
         Relationships: []
       }

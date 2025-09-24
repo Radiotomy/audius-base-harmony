@@ -101,6 +101,11 @@ const Navigation: React.FC = () => {
                 Wallet
               </Button>
             </Link>
+            <Link to="/events">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Events
+              </Button>
+            </Link>
             <Link to="/nft-marketplace">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 NFT Market

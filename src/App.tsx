@@ -23,6 +23,7 @@ import WalletDashboard from "./pages/WalletDashboard";
 import { ArtistEarnings } from "./pages/ArtistEarnings";
 import NFTMarketplace from "./pages/NFTMarketplace";
 import NFTStudio from "./pages/NFTStudio";
+import { Events } from './pages/Events';
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -72,6 +73,7 @@ const App = () => (
                           <ArtistEarnings />
                         </ProtectedRoute>
                       } />
+                      <Route path="/events" element={<Events />} />
                       <Route path="/nft-marketplace" element={<NFTMarketplace />} />
                       <Route path="/nft-studio" element={
                         <ProtectedRoute>
