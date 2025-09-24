@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { EventCard } from '@/components/EventCard';
 import { useEvents, Event } from '@/hooks/useEvents';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useTickets } from '@/hooks/useTickets';
 import { useNavigate } from 'react-router-dom';
 import SkeletonCard from '@/components/SkeletonCard';
@@ -16,6 +17,7 @@ import SkeletonCard from '@/components/SkeletonCard';
 export const Events = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isArtist, isAdmin } = useUserRole();
   const { events, loading } = useEvents();
   const { purchaseTicket } = useTickets();
   
@@ -95,10 +97,12 @@ export const Events = () => {
           </p>
         </div>
         
-        <Button onClick={handleCreateEvent} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Create Event
-        </Button>
+        {(isArtist() || isAdmin()) && (
+          <Button onClick={handleCreateEvent} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Create Event
+          </Button>
+        )}
       </div>
 
       {/* Search and Filters */}
@@ -169,7 +173,7 @@ export const Events = () => {
                     ? "Try adjusting your search criteria"
                     : "Be the first to create an event!"}
                 </p>
-                {user && (
+                {(isArtist() || isAdmin()) && (
                   <Button onClick={handleCreateEvent}>
                     Create Event
                   </Button>
@@ -226,7 +230,7 @@ export const Events = () => {
                 <p className="text-muted-foreground mb-4">
                   No events scheduled at the moment
                 </p>
-                {user && (
+                {(isArtist() || isAdmin()) && (
                   <Button onClick={handleCreateEvent}>
                     Create Event
                   </Button>
