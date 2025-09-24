@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { testWithTrendingTrack } from '@/utils/audioStreamTest';
 import Navigation from '@/components/Navigation';
+import { WalletConnectionDialog } from '@/components/WalletConnectionDialog';
 
 const Index = () => {
   const [showPlayer, setShowPlayer] = React.useState(false);
@@ -131,9 +132,11 @@ const Index = () => {
               <Play className="mr-2 h-5 w-5" />
               {loading ? 'Loading...' : 'Start Listening'}
             </Button>
-            <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-smooth">
-              Connect Wallet
-            </Button>
+            <WalletConnectionDialog>
+              <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-smooth">
+                Connect Wallet
+              </Button>
+            </WalletConnectionDialog>
           </div>
         </div>
       </section>
