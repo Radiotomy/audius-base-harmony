@@ -8,6 +8,7 @@ import { ArrowLeft, Search, Users, Music, ExternalLink } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import ArtistCard from '@/components/ArtistCard';
 import TipArtistDialog from '@/components/TipArtistDialog';
+import EnhancedAudioPlayer from '@/components/EnhancedAudioPlayer';
 import { useAudiusTrendingTracks, useAudiusSearch } from '@/hooks/useAudius';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { audiusService } from '@/services/audius';
@@ -17,6 +18,7 @@ const Artists = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtist, setSelectedArtist] = useState<any>(null);
   const [showTipDialog, setShowTipDialog] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
   
   // Fetch trending tracks to extract artists
   const { tracks: trendingTracks, loading: tracksLoading } = useAudiusTrendingTracks(50);
@@ -55,7 +57,12 @@ const Artists = () => {
     }
   };
 
-  const { play } = usePlayer();
+  const { play, ...player } = usePlayer();
+
+  // Show player when track is playing
+  React.useEffect(() => {
+    setShowPlayer(!!player.currentTrack);
+  }, [player.currentTrack]);
 
   const handleArtistPlay = async (artist: any) => {
     try {
@@ -283,6 +290,15 @@ const Artists = () => {
         onOpenChange={setShowTipDialog}
         artist={selectedArtist || { id: '', name: '' }}
       />
+
+      {/* Audio Player */}
+      {showPlayer && player.currentTrack && (
+        <EnhancedAudioPlayer
+          isCompact={true}
+          showEqualizer={true}
+          showQueue={true}
+        />
+      )}
     </div>
   );
 };
