@@ -7,6 +7,7 @@ import { OnchainProvider } from "@/contexts/OnchainKitProvider";
 import { SolanaProvider } from "@/contexts/SolanaContext";
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Navigation from "@/components/Navigation";
 import MobileAudioPlayer from "@/components/MobileAudioPlayer";
 import Index from "./pages/Index";
@@ -38,21 +39,48 @@ const App = () => (
                   <Navigation />
                   <main className="pb-20 lg:pb-8">
                     <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/trending" element={<Trending />} />
-                  <Route path="/artists" element={<Artists />} />
-                  <Route path="/artist/:artistId" element={<ArtistProfile />} />
-                  <Route path="/artist-registration" element={<ArtistRegistration />} />
-                  <Route path="/search" element={<SearchResults />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/dashboard/profile" element={<DashboardProfile />} />
-                  <Route path="/wallet" element={<WalletDashboard />} />
-                  <Route path="/artist-earnings" element={<ArtistEarnings />} />
-                  <Route path="/nft-marketplace" element={<NFTMarketplace />} />
-                  <Route path="/nft-studio" element={<NFTStudio />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/trending" element={<Trending />} />
+                      <Route path="/artists" element={<Artists />} />
+                      <Route path="/artist/:artistId" element={<ArtistProfile />} />
+                      <Route path="/search" element={<SearchResults />} />
+                      
+                      {/* Protected Routes */}
+                      <Route path="/artist-registration" element={
+                        <ProtectedRoute>
+                          <ArtistRegistration />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard" element={
+                        <ProtectedRoute>
+                          <Dashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/profile" element={
+                        <ProtectedRoute>
+                          <DashboardProfile />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/wallet" element={
+                        <ProtectedRoute>
+                          <WalletDashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/artist-earnings" element={
+                        <ProtectedRoute>
+                          <ArtistEarnings />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/nft-marketplace" element={<NFTMarketplace />} />
+                      <Route path="/nft-studio" element={
+                        <ProtectedRoute>
+                          <NFTStudio />
+                        </ProtectedRoute>
+                      } />
+                      
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>
                   <MobileAudioPlayer />

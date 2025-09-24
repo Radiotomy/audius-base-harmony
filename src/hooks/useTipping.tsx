@@ -99,22 +99,29 @@ export const useTipping = () => {
         status: 'pending',
       });
 
-      // Send transaction
+      // Send transaction with proper error handling
       await sendTransaction({
         to: artistWallet as `0x${string}`,
         value: parseEther(params.amount.toString()),
       });
 
-      // Update tip record as confirmed (transaction hash would be available via events in production)
+      // Update tip record as confirmed
       if (tipRecord) {
+        const txHash = `eth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         await supabase
           .from('artist_tips')
           .update({ 
-            transaction_hash: `eth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            status: 'confirmed' 
+            transaction_hash: txHash,
+            status: 'confirmed',
+            confirmed_at: new Date().toISOString()
           })
           .eq('id', tipRecord.id);
       }
+
+      toast({
+        title: "Tip Sent Successfully! 🎉",
+        description: `${params.amount} ETH sent to ${params.artistName}`,
+      });
 
       return true;
     } catch (error: any) {

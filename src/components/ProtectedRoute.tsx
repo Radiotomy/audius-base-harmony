@@ -1,29 +1,38 @@
 import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Skeleton } from '@/components/ui/skeleton';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface ProtectedRouteProps {
   children: ReactNode;
+  requireAuth?: boolean;
+  requireArtist?: boolean;
 }
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
+const ProtectedRoute = ({ 
+  children, 
+  requireAuth = true, 
+  requireArtist = false 
+}: ProtectedRouteProps) => {
+  const { user, loading, session } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="space-y-4 w-full max-w-md">
-          <Skeleton className="h-8 w-32 mx-auto" />
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-12 w-full" />
-        </div>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
+  if (requireAuth && !user) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // Add artist verification check if needed
+  if (requireArtist && user) {
+    // This would check if user has artist role/permissions
+    // For now, we'll allow access but this can be enhanced
   }
 
   return <>{children}</>;

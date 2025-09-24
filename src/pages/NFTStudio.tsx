@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNFTTokens } from '@/hooks/useNFT';
-import { NFTMintDialog } from '@/components/NFTMintDialog';
+import { EnhancedNFTMintDialog } from '@/components/EnhancedNFTMintDialog';
 import { Loader2, Music, Package, Coins } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -71,7 +71,7 @@ export default function NFTStudio() {
 
           {/* Quick Actions */}
           <div className="flex gap-4 mb-8">
-            <NFTMintDialog />
+            <EnhancedNFTMintDialog />
           </div>
 
           {/* Collections Management */}
@@ -155,7 +155,7 @@ export default function NFTStudio() {
                 <p className="text-muted-foreground mb-4">
                   Create your first collection and start minting music NFTs!
                 </p>
-                <NFTMintDialog />
+                <EnhancedNFTMintDialog />
               </div>
             )}
           </div>

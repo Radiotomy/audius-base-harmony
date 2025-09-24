@@ -7,6 +7,23 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Music } from 'lucide-react';
+import { z } from 'zod';
+import { useToast } from '@/hooks/use-toast';
+
+// Validation schemas
+const authSchema = z.object({
+  email: z.string().email('Invalid email address').min(1, 'Email is required'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase, and number'),
+});
+
+const signUpSchema = authSchema.extend({
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -14,9 +31,11 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('signin');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -27,33 +46,62 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setErrors({});
     
-    const { error } = await signIn(email, password);
-    
-    if (!error) {
-      navigate('/');
+    try {
+      const validatedData = authSchema.parse({ email, password });
+      setLoading(true);
+      
+      const { error } = await signIn(validatedData.email, validatedData.password);
+      
+      if (!error) {
+        navigate('/');
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.issues.forEach((issue) => {
+          if (issue.path[0]) {
+            fieldErrors[issue.path[0] as string] = issue.message;
+          }
+        });
+        setErrors(fieldErrors);
+      }
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
     
-    if (password !== confirmPassword) {
-      return;
+    try {
+      const validatedData = signUpSchema.parse({ email, password, confirmPassword });
+      setLoading(true);
+      
+      const { error } = await signUp(validatedData.email, validatedData.password);
+      
+      if (!error) {
+        setActiveTab('signin');
+        toast({
+          title: "Account Created",
+          description: "Please check your email to confirm your account.",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.issues.forEach((issue) => {
+          if (issue.path[0]) {
+            fieldErrors[issue.path[0] as string] = issue.message;
+          }
+        });
+        setErrors(fieldErrors);
+      }
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(true);
-    
-    const { error } = await signUp(email, password);
-    
-    if (!error) {
-      setActiveTab('signin');
-    }
-    
-    setLoading(false);
   };
 
   return (
@@ -104,8 +152,11 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full"
+                      className={`w-full ${errors.email ? 'border-destructive' : ''}`}
                     />
+                    {errors.email && (
+                      <p className="text-sm text-destructive">{errors.email}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -117,8 +168,11 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full"
+                      className={`w-full ${errors.password ? 'border-destructive' : ''}`}
                     />
+                    {errors.password && (
+                      <p className="text-sm text-destructive">{errors.password}</p>
+                    )}
                   </div>
                   
                   <Button 
@@ -142,8 +196,11 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full"
+                      className={`w-full ${errors.email ? 'border-destructive' : ''}`}
                     />
+                    {errors.email && (
+                      <p className="text-sm text-destructive">{errors.email}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -151,12 +208,18 @@ const Auth = () => {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Create a password"
+                      placeholder="Create a strong password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full"
+                      className={`w-full ${errors.password ? 'border-destructive' : ''}`}
                     />
+                    {errors.password && (
+                      <p className="text-sm text-destructive">{errors.password}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Must contain 8+ characters, uppercase, lowercase, and number
+                    </p>
                   </div>
                   
                   <div className="space-y-2">
@@ -168,17 +231,16 @@ const Auth = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full"
+                      className={`w-full ${errors.confirmPassword ? 'border-destructive' : ''}`}
                     />
+                    {errors.confirmPassword && (
+                      <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                    )}
                   </div>
-                  
-                  {password !== confirmPassword && confirmPassword && (
-                    <p className="text-sm text-destructive">Passwords do not match</p>
-                  )}
                   
                   <Button 
                     type="submit" 
-                    disabled={loading || password !== confirmPassword}
+                    disabled={loading}
                     className="w-full bg-primary hover:bg-primary/90"
                   >
                     {loading ? 'Creating Account...' : 'Create Account'}
