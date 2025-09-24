@@ -26,6 +26,7 @@ import NFTMarketplace from "./pages/NFTMarketplace";
 import NFTStudio from "./pages/NFTStudio";
 import { Events } from './pages/Events';
 import { CreateEvent } from './pages/CreateEvent';
+import ArtistDashboard from "./pages/ArtistDashboard";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -78,6 +79,11 @@ const App = () => (
                       <Route path="/artist-earnings" element={
                         <ProtectedRoute>
                           <ArtistEarnings />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/artist-dashboard" element={
+                        <ProtectedRoute requireArtist>
+                          <ArtistDashboard />
                         </ProtectedRoute>
                       } />
                       <Route path="/events" element={<Events />} />
