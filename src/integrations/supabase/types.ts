@@ -1064,6 +1064,42 @@ export type Database = {
         }
         Relationships: []
       }
+      security_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       track_ratings: {
         Row: {
           created_at: string
@@ -1352,6 +1388,45 @@ export type Database = {
           },
         ]
       }
+      public_tip_stats: {
+        Row: {
+          amount: number | null
+          artist_id: string | null
+          artist_name: string | null
+          created_at: string | null
+          currency: string | null
+          masked_artist_wallet_address: string | null
+          masked_wallet_address: string | null
+          message: string | null
+          network: string | null
+          status: string | null
+        }
+        Insert: {
+          amount?: number | null
+          artist_id?: string | null
+          artist_name?: string | null
+          created_at?: string | null
+          currency?: string | null
+          masked_artist_wallet_address?: never
+          masked_wallet_address?: never
+          message?: string | null
+          network?: string | null
+          status?: string | null
+        }
+        Update: {
+          amount?: number | null
+          artist_id?: string | null
+          artist_name?: string | null
+          created_at?: string | null
+          currency?: string | null
+          masked_artist_wallet_address?: never
+          masked_wallet_address?: never
+          message?: string | null
+          network?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       public_venues: {
         Row: {
           address: string | null
@@ -1411,6 +1486,10 @@ export type Database = {
       }
       has_role: {
         Args: { _role: string; _user_id: string }
+        Returns: boolean
+      }
+      user_has_events_at_venue: {
+        Args: { _user_id: string; _venue_id: string }
         Returns: boolean
       }
     }
