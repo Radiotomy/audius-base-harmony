@@ -1,6 +1,7 @@
 import React from 'react';
-import { Play, Heart, Users, TrendingUp, Zap, Plus } from 'lucide-react';
+import { Play, Heart, Users, TrendingUp, Zap, Plus, Radio } from 'lucide-react';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
+import { useRadioStation } from '@/hooks/useRadioStation';
 import TrackCard from '@/components/TrackCard';
 import ArtistCard from '@/components/ArtistCard';
 import EnhancedAudioPlayer from '@/components/EnhancedAudioPlayer';
@@ -16,9 +17,11 @@ import { WalletConnectionDialog } from '@/components/WalletConnectionDialog';
 
 const Index = () => {
   const [showPlayer, setShowPlayer] = React.useState(false);
+  const [isRadioMode, setIsRadioMode] = React.useState(false);
   const { user } = useAuth();
   const player = usePlayer();
   const { tracks: trendingTracks, loading, error } = useAudiusTrendingTracks(6);
+  const { createRadioQueue, isLoading: radioLoading } = useRadioStation();
 
   // Get top 3 artists from trending tracks
   const featuredArtists = React.useMemo(() => {
@@ -73,6 +76,23 @@ const Index = () => {
     return null;
   };
 
+  // Start radio station with randomized tracks from different artists
+  const handleStartRadio = async () => {
+    try {
+      setIsRadioMode(true);
+      const radioQueue = await createRadioQueue();
+      
+      if (radioQueue.length > 0) {
+        // Start playing the first track with the full radio queue
+        await player.play(radioQueue[0], radioQueue, true);
+        setShowPlayer(true);
+      }
+    } catch (error) {
+      console.error('Failed to start radio:', error);
+      setIsRadioMode(false);
+    }
+  };
+
   // Transform track data and handle play
   const handleTrackPlay = async (track: any) => {
     const transformedTrack = {
@@ -108,26 +128,20 @@ const Index = () => {
             AudioBASE
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Stream Audius music seamlessly while tipping artists on Base. The future of Web3 music discovery.
+            Stream Audius music seamlessly while tipping artists on Base. Start your personalized radio station with tracks from different artists.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="gradient-primary hover:scale-105 transition-bounce"
-              onClick={() => {
-                if (trendingTracks.length > 0) {
-                  handleTrackPlay(trendingTracks[0]);
-                } else {
-                  // Scroll to trending section if no tracks loaded yet
-                  document.querySelector('[data-section="trending"]')?.scrollIntoView({ 
-                    behavior: 'smooth' 
-                  });
-                }
-              }}
-              disabled={loading}
+              className="gradient-primary hover:scale-105 transition-bounce relative"
+              onClick={handleStartRadio}
+              disabled={loading || radioLoading}
             >
-              <Play className="mr-2 h-5 w-5" />
-              {loading ? 'Loading...' : 'Start Listening'}
+              <Radio className="mr-2 h-5 w-5" />
+              {radioLoading ? 'Starting Radio...' : isRadioMode ? '🎵 Radio Playing' : 'Start Radio Station'}
+              {isRadioMode && (
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-pulse"></span>
+              )}
             </Button>
             <WalletConnectionDialog>
               <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-smooth">
@@ -314,6 +328,16 @@ const Index = () => {
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="p-6 shadow-card bg-card/50">
+              <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Radio className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Radio Station</h3>
+              <p className="text-sm text-muted-foreground">
+                AI-curated radio with tracks from different artists for endless discovery
+              </p>
+            </Card>
+            
             <Card className="p-6 shadow-card bg-card/50">
               <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Play className="h-6 w-6 text-primary-foreground" />
