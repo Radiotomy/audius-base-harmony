@@ -82,7 +82,9 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
                 <p className="text-sm text-muted-foreground">
                   Connect your Ethereum wallet to tip artists and mint NFTs on Base network.
                 </p>
-                <ConnectWallet />
+                <OnchainWallet>
+                  <ConnectWallet />
+                </OnchainWallet>
               </div>
             ) : (
               <div className="space-y-4">
