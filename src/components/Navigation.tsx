@@ -70,6 +70,13 @@ const Navigation: React.FC = () => {
                 Artists
               </Button>
             </Link>
+            {user && (
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                  Dashboard
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
