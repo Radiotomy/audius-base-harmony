@@ -68,13 +68,22 @@ export interface AudiusUser {
   follower_count: number;
   followee_count: number;
   track_count: number;
+  playlist_count?: number;
+  repost_count?: number;
+  supporter_count?: number;
+  supporting_count?: number;
   bio?: string;
   location?: string;
   is_verified?: boolean;
+  is_deactivated?: boolean;
   twitter_handle?: string;
   instagram_handle?: string;
+  tiktok_handle?: string;
   website?: string;
   donation?: string;
+  artist_pick_track_id?: string;
+  does_follow_current_user?: boolean;
+  current_user_followee_follow_count?: number;
   profile_picture?: {
     '150x150'?: string;
     '480x480'?: string;
@@ -83,6 +92,11 @@ export interface AudiusUser {
   cover_photo?: {
     '640x'?: string;
     '2000x'?: string;
+  };
+  wallet?: string;
+  associated_wallets?: {
+    eth?: string;
+    sol?: string;
   };
 }
 
@@ -147,7 +161,8 @@ export const audiusService = {
   async getUser(userId: string): Promise<AudiusUser | null> {
     try {
       const response = await makeRequest(`/v1/users/${userId}`);
-      return response.data[0] || null;
+      console.log('Audius getUser response:', response); // Debug logging
+      return response.data || null;
     } catch (error) {
       console.error(`Failed to fetch user ${userId}:`, error);
       return null;

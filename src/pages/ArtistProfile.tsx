@@ -182,10 +182,16 @@ const ArtistProfile = () => {
                   <div className="font-semibold text-foreground">{artist.followee_count}</div>
                   <div className="text-muted-foreground">Following</div>
                 </div>
+                {artist.playlist_count !== undefined && (
+                  <div className="text-center md:text-left">
+                    <div className="font-semibold text-foreground">{artist.playlist_count}</div>
+                    <div className="text-muted-foreground">Playlists</div>
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 justify-center md:justify-start">
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                 <Button 
                   onClick={handlePlayAllTracks}
                   className="gradient-primary"
@@ -292,11 +298,37 @@ const ArtistProfile = () => {
                   </div>
                 )}
                 
-                {/* Social Links would go here if available from Audius API */}
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View on Audius
+                {/* Social Links */}
+                <div className="flex flex-wrap gap-2">
+                  {artist.twitter_handle && (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={`https://twitter.com/${artist.twitter_handle}`} target="_blank" rel="noopener noreferrer">
+                        <Twitter className="h-4 w-4 mr-2" />
+                        Twitter
+                      </a>
+                    </Button>
+                  )}
+                  {artist.instagram_handle && (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={`https://instagram.com/${artist.instagram_handle}`} target="_blank" rel="noopener noreferrer">
+                        <Instagram className="h-4 w-4 mr-2" />
+                        Instagram
+                      </a>
+                    </Button>
+                  )}
+                  {artist.website && (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={artist.website} target="_blank" rel="noopener noreferrer">
+                        <Globe className="h-4 w-4 mr-2" />
+                        Website
+                      </a>
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={`https://audius.co/${artist.handle}`} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View on Audius
+                    </a>
                   </Button>
                 </div>
               </div>
