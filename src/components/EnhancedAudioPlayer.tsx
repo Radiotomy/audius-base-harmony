@@ -11,7 +11,7 @@ import {
 import { usePlayer, type Track, type RepeatMode } from '@/contexts/PlayerContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useFavorites } from '@/hooks/useFavorites';
-import WaveformVisualizer from './WaveformVisualizer';
+import RealTimeVisualizer from './RealTimeVisualizer';
 import EqualizerControls from './EqualizerControls';
 import {
   DropdownMenu,
@@ -66,7 +66,10 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     setCrossfade,
     clearQueue,
     webAudio,
+    audioElement,
   } = usePlayer();
+
+  const audioRef = React.useRef<HTMLAudioElement | null>(audioElement);
 
   const { isFavorited, toggleFavorite } = useFavorites();
   const isFav = currentTrack ? isFavorited(currentTrack.id) : false;
@@ -147,16 +150,28 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
             )}
           </Button>
           
+          {/* Track Cover */}
+          {currentTrack.cover && (
+            <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted/50 flex-shrink-0">
+              <img
+                src={currentTrack.cover}
+                alt={currentTrack.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-sm font-medium truncate">{currentTrack.title}</span>
               <span className="text-xs text-muted-foreground">by {currentTrack.artist}</span>
             </div>
             <div className="relative">
-              <WaveformVisualizer 
+              <RealTimeVisualizer 
                 isPlaying={isPlaying} 
                 className="h-6" 
-                analyserData={webAudio.analyserData}
+                audioElement={webAudio.audioContext?.destination?.context === webAudio.audioContext ? audioRef.current : null}
+                type="bars"
               />
               <div className="absolute inset-0 flex items-center">
                 <Slider
@@ -271,9 +286,11 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
 
         {/* Waveform */}
         <div className="flex justify-center">
-          <WaveformVisualizer 
+          <RealTimeVisualizer 
             isPlaying={isPlaying} 
-            analyserData={webAudio.analyserData}
+            audioElement={webAudio.audioContext?.destination?.context === webAudio.audioContext ? audioRef.current : null}
+            type="spectrum"
+            className="w-full max-w-md"
           />
         </div>
 

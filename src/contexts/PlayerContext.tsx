@@ -115,12 +115,34 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       const handleEnded = () => {
         console.log('🔚 Track ended, checking repeat mode');
-        if (state.repeatMode === 'track') {
-          audio.currentTime = 0;
-          audio.play();
-        } else {
-          next();
-        }
+        setState(prev => {
+          if (prev.repeatMode === 'track') {
+            audio.currentTime = 0;
+            audio.play();
+            return prev;
+          } else {
+            // Call next with current state
+            const nextIndex = prev.currentIndex + 1;
+            if (nextIndex < prev.queue.length) {
+              console.log('🎵 Auto-playing next track:', prev.queue[nextIndex].title);
+              // Use setTimeout to avoid state conflicts
+              setTimeout(() => {
+                const nextTrack = prev.queue[nextIndex];
+                play(nextTrack, prev.queue, true);
+              }, 100);
+            } else if (prev.repeatMode === 'playlist' && prev.queue.length > 0) {
+              console.log('🔄 Restarting playlist');
+              setTimeout(() => {
+                const firstTrack = prev.queue[0];
+                play(firstTrack, prev.queue, true);
+              }, 100);
+            } else {
+              console.log('🔚 End of queue reached');
+              return { ...prev, isPlaying: false };
+            }
+            return prev;
+          }
+        });
       };
 
       const handleError = (e: Event) => {

@@ -85,6 +85,8 @@ const Index = () => {
       if (radioQueue.length > 0) {
         // Start playing the first track with the full radio queue
         await player.play(radioQueue[0], radioQueue, true);
+        // Set to playlist repeat mode for continuous play
+        player.setRepeatMode('playlist');
         setShowPlayer(true);
       }
     } catch (error) {

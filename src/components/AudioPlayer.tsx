@@ -6,7 +6,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Share, List, MoreHo
 import { usePlayer, type Track } from '@/contexts/PlayerContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useFavorites } from '@/hooks/useFavorites';
-import WaveformVisualizer from './WaveformVisualizer';
+import RealTimeVisualizer from './RealTimeVisualizer';
 import EqualizerControls from './EqualizerControls';
 
 interface AudioPlayerProps {
@@ -24,7 +24,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   showQueue = false,
   showEqualizer = false
 }) => {
-  // Fixed: Using List instead of Queue icon
   const [expanded, setExpanded] = React.useState(false);
   const {
     currentTrack,
@@ -45,15 +44,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     addToQueue,
     removeFromQueue,
     webAudio,
+    audioElement,
   } = usePlayer();
+
+  const audioRef = React.useRef<HTMLAudioElement | null>(audioElement);
 
   const { isFavorited, toggleFavorite } = useFavorites();
   const isFav = currentTrack ? isFavorited(currentTrack.id) : false;
 
-  // Initialize with track if provided, or switch tracks when initialTrack changes
+  // Initialize with track if provided
   React.useEffect(() => {
     if (initialTrack) {
-      // Auto-play the new track when initialTrack changes
       play(initialTrack, initialQueue, true);
     }
   }, [initialTrack, initialQueue, play]);
@@ -107,16 +108,28 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             )}
           </Button>
           
+          {/* Track Cover */}
+          {currentTrack.cover && (
+            <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted/50 flex-shrink-0">
+              <img
+                src={currentTrack.cover}
+                alt={currentTrack.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-sm font-medium truncate">{currentTrack.title}</span>
               <span className="text-xs text-muted-foreground">by {currentTrack.artist}</span>
             </div>
             <div className="relative">
-              <WaveformVisualizer 
+              <RealTimeVisualizer 
                 isPlaying={isPlaying} 
                 className="h-6" 
-                analyserData={webAudio.analyserData}
+                audioElement={audioRef.current}
+                type="bars"
               />
               <div className="absolute inset-0 flex items-center">
                 <Slider
@@ -171,11 +184,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 className="w-16"
               />
             </div>
-            {queue.length > 0 && (
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setExpanded(true)} aria-label="Open advanced player">
-                <List className="h-3 w-3" />
-              </Button>
-            )}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => setExpanded(true)}
+            >
+              <List className="h-3 w-3" />
+            </Button>
           </div>
         </div>
       </Card>
@@ -192,7 +208,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
-            title="Minimize player"
           >
             <Minimize2 className="h-4 w-4" />
           </Button>
@@ -208,10 +223,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 src={currentTrack.cover}
                 alt={currentTrack.title}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<div class="text-4xl">🎵</div>';
-                }}
               />
             ) : (
               <div className="text-4xl">🎵</div>
@@ -221,9 +232,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
         {/* Waveform */}
         <div className="flex justify-center">
-          <WaveformVisualizer 
+          <RealTimeVisualizer 
             isPlaying={isPlaying} 
-            analyserData={webAudio.analyserData}
+            audioElement={audioRef.current}
+            type="spectrum"
+            className="w-full max-w-md"
           />
         </div>
 
@@ -328,7 +341,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         {/* Queue Preview */}
         {showQueue && queue.length > 1 && (
           <div className="border-t pt-4">
-            <h4 className="text-sm font-medium mb-2">Up Next ({queue.length - currentIndex - 1})</h4>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-sm font-medium">Up Next ({queue.length - currentIndex - 1})</h4>
+            </div>
             <div className="space-y-1 max-h-32 overflow-y-auto">
               {queue.slice(currentIndex + 1, currentIndex + 4).map((track, index) => (
                 <div key={track.id} className="flex items-center gap-2 text-sm p-2 rounded hover:bg-accent">
@@ -358,7 +373,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
         {/* Keyboard Shortcuts Info */}
         <div className="text-xs text-muted-foreground text-center">
-          Press Space to play/pause • ← → for prev/next • ↑ ↓ for volume • J/L to seek
+          Space: play/pause • ←→: prev/next • ↑↓: volume
         </div>
       </div>
     </Card>
