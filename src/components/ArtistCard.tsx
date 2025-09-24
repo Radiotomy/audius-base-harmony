@@ -2,7 +2,8 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Zap } from 'lucide-react';
+import { Play, Zap, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import FavoriteButton from '@/components/FavoriteButton';
 
 interface Artist {
@@ -19,11 +20,18 @@ interface ArtistCardProps {
   artist: Artist;
   onPlay?: () => void;
   onTip?: (artist: Artist) => void;
+  onViewProfile?: (artist: Artist) => void;
 }
 
-const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip }) => {
+const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip, onViewProfile }) => {
+  const navigate = useNavigate();
+
+  const handleViewProfile = () => {
+    navigate(`/artist/${artist.id}`);
+  };
+
   return (
-    <Card className="p-4 shadow-card bg-card hover:shadow-glow transition-smooth group">
+    <Card className="p-4 shadow-card bg-card hover:shadow-glow transition-smooth group cursor-pointer" onClick={handleViewProfile}>
       <div className="space-y-3">
         {/* Avatar */}
         <div className="relative">
@@ -64,7 +72,10 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip }) => {
         {/* Actions */}
         <div className="flex gap-2 pt-2">
           <Button 
-            onClick={onPlay}
+            onClick={(e) => {
+              e.stopPropagation();
+              onPlay?.();
+            }}
             size="sm" 
             className="flex-1 gradient-primary hover:scale-105 transition-bounce"
           >
@@ -72,7 +83,10 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip }) => {
             Play
           </Button>
           <Button 
-            onClick={() => onTip?.(artist)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTip?.(artist);
+            }}
             variant="outline" 
             size="sm"
             className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-smooth"
@@ -80,7 +94,20 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPlay, onTip }) => {
             <Zap className="h-3 w-3 mr-1" />
             Tip
           </Button>
-          <FavoriteButton trackId={artist.id} />
+          <Button 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewProfile();
+            }}
+            variant="outline" 
+            size="icon"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-smooth"
+          >
+            <User className="h-3 w-3" />
+          </Button>
+          <div onClick={(e) => e.stopPropagation()}>
+            <FavoriteButton trackId={artist.id} />
+          </div>
         </div>
       </div>
     </Card>

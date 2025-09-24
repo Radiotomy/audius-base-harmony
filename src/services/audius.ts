@@ -69,6 +69,12 @@ export interface AudiusUser {
   followee_count: number;
   track_count: number;
   bio?: string;
+  location?: string;
+  is_verified?: boolean;
+  twitter_handle?: string;
+  instagram_handle?: string;
+  website?: string;
+  donation?: string;
   profile_picture?: {
     '150x150'?: string;
     '480x480'?: string;
@@ -153,11 +159,40 @@ export const audiusService = {
     try {
       const response = await makeRequest(`/v1/users/${userId}/tracks`, {
         limit,
-        offset
+        offset,
+        sort: 'date'
       });
       return response.data || [];
     } catch (error) {
       console.error(`Failed to fetch tracks for user ${userId}:`, error);
+      return [];
+    }
+  },
+
+  // Get user's playlists (for future use)
+  async getUserPlaylists(userId: string, limit: number = 10, offset: number = 0): Promise<any[]> {
+    try {
+      const response = await makeRequest(`/v1/users/${userId}/playlists`, {
+        limit,
+        offset
+      });
+      return response.data || [];
+    } catch (error) {
+      console.error(`Failed to fetch playlists for user ${userId}:`, error);
+      return [];
+    }
+  },
+
+  // Get user's favorites (for future use)
+  async getUserFavorites(userId: string, limit: number = 10, offset: number = 0): Promise<AudiusTrack[]> {
+    try {
+      const response = await makeRequest(`/v1/users/${userId}/favorites`, {
+        limit,
+        offset
+      });
+      return response.data || [];
+    } catch (error) {
+      console.error(`Failed to fetch favorites for user ${userId}:`, error);
       return [];
     }
   },

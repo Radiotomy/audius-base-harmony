@@ -239,12 +239,15 @@ const Artists = () => {
                       {artist.genre}
                     </Badge>
                     
-                    {/* Actions */}
+                     {/* Actions */}
                      <div className="flex gap-2 justify-center">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleArtistPlay(artist)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleArtistPlay(artist);
+                        }}
                       >
                         <Music className="h-4 w-4 mr-1" />
                         Play
@@ -252,10 +255,22 @@ const Artists = () => {
                       <Button
                         size="sm"
                         className="gradient-primary"
-                        onClick={() => handleArtistTip(artist)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleArtistTip(artist);
+                        }}
                       >
                         💎 Tip
                       </Button>
+                      <Link to={`/artist/${artist.id}`}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
+                      </Link>
                     </div>
                     
                     {/* Bio Preview */}

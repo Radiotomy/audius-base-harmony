@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import Trending from "./pages/Trending";
 import Artists from "./pages/Artists";
 import SearchResults from "./pages/SearchResults";
+import ArtistProfile from "./pages/ArtistProfile";
 import Dashboard from "./pages/Dashboard";
 import DashboardProfile from "./pages/DashboardProfile";
 import { ArtistRegistration } from "./pages/ArtistRegistration";
@@ -41,6 +42,7 @@ const App = () => (
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/trending" element={<Trending />} />
                   <Route path="/artists" element={<Artists />} />
+                  <Route path="/artist/:artistId" element={<ArtistProfile />} />
                   <Route path="/artist-registration" element={<ArtistRegistration />} />
                   <Route path="/search" element={<SearchResults />} />
                   <Route path="/dashboard" element={<Dashboard />} />
