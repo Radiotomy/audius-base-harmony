@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Home, TrendingUp, Users, Briefcase, Wallet, ShoppingBag, Palette } from 'lucide-react';
+import { Menu, X, Search, Home, TrendingUp, Users, Briefcase, Wallet, ShoppingBag, Palette, Calendar } from 'lucide-react';
 import audiobaseLogo from '@/assets/audiobase-logo.png';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -26,6 +26,7 @@ const MobileNavigation = () => {
     { to: '/', icon: Home, label: 'Home' },
     { to: '/trending', icon: TrendingUp, label: 'Trending' },
     { to: '/artists', icon: Users, label: 'Artists' },
+    { to: '/events', icon: Calendar, label: 'Events' },
     { to: '/artist-registration', icon: Briefcase, label: 'Become an Artist' },
     { to: '/wallet', icon: Wallet, label: 'Wallet' },
     { to: '/nft-marketplace', icon: ShoppingBag, label: 'NFT Market' },
