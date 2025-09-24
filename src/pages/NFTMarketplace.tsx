@@ -1,3 +1,4 @@
+// NFT Marketplace - Discover and collect unique music NFTs
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
