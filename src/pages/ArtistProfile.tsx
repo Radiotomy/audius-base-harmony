@@ -34,7 +34,8 @@ const ArtistProfile = () => {
     tracks, 
     playlists,
     loading, 
-    error 
+    error,
+    isAudioBASEArtist
   } = useArtistProfile(artistId || '');
   
   const { play, ...player } = usePlayer();
@@ -126,10 +127,10 @@ const ArtistProfile = () => {
             </Link>
           </div>
 
-          {/* AudioBASE Branding */}
+          {/* Artist Badge */}
           <div className="absolute top-4 right-4 z-10">
-            <Badge className="bg-primary text-primary-foreground">
-              AudioBASE Artist
+            <Badge className={isAudioBASEArtist ? "bg-primary text-primary-foreground" : "bg-orange-500 text-white"}>
+              {isAudioBASEArtist ? "AudioBASE Artist" : "Audius Artist"}
             </Badge>
           </div>
         </div>

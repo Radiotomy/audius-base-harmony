@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { audiusService, AudiusUser, AudiusTrack } from '@/services/audius';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ArtistProfileData {
   artist: AudiusUser | null;
@@ -8,6 +9,7 @@ interface ArtistProfileData {
   playlists: any[]; // Placeholder for future playlist support
   loading: boolean;
   error: string | null;
+  isAudioBASEArtist: boolean;
 }
 
 export const useArtistProfile = (artistId: string): ArtistProfileData => {
@@ -16,6 +18,7 @@ export const useArtistProfile = (artistId: string): ArtistProfileData => {
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAudioBASEArtist, setIsAudioBASEArtist] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,6 +31,17 @@ export const useArtistProfile = (artistId: string): ArtistProfileData => {
       try {
         setLoading(true);
         setError(null);
+
+        // First check if this is a local AudioBASE artist
+        const { data: localProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .or(`id.eq.${artistId},audius_user_id.eq.${artistId}`)
+          .single();
+
+        if (localProfile) {
+          setIsAudioBASEArtist(true);
+        }
 
         // Fetch artist profile and tracks in parallel
         const [artistData, tracksData] = await Promise.all([
@@ -67,6 +81,7 @@ export const useArtistProfile = (artistId: string): ArtistProfileData => {
     tracks,
     playlists,
     loading,
-    error
+    error,
+    isAudioBASEArtist
   };
 };
