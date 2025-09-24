@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { testWithTrendingTrack } from '@/utils/audioStreamTest';
-import Navigation from '@/components/Navigation';
 import { WalletConnectionDialog } from '@/components/WalletConnectionDialog';
 
 const Index = () => {
@@ -101,8 +100,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10">
         <div className="absolute inset-0 bg-[url('/src/assets/hero-audiobase.jpg')] bg-cover bg-center bg-no-repeat opacity-20" />

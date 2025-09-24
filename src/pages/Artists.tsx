@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Search, Users, Music, ExternalLink } from 'lucide-react';
-import Navigation from '@/components/Navigation';
 import ArtistCard from '@/components/ArtistCard';
 import TipArtistDialog from '@/components/TipArtistDialog';
 import EnhancedAudioPlayer from '@/components/EnhancedAudioPlayer';
@@ -106,8 +105,6 @@ const Artists = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       {/* Hero Section */}
       <section className="py-16 border-b border-border">
         <div className="container mx-auto px-4">
