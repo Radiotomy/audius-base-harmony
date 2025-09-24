@@ -1,0 +1,44 @@
+-- Fix Function Search Path Mutable Warning
+-- Update function to set search_path for security
+
+CREATE OR REPLACE FUNCTION public.get_public_tip_stats()
+RETURNS TABLE (
+  artist_id text,
+  artist_name text,
+  currency text,
+  amount numeric,
+  message text,
+  created_at timestamp with time zone,
+  network text,
+  status text,
+  masked_wallet_address text,
+  masked_artist_wallet_address text
+)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT 
+    t.artist_id,
+    t.artist_name,
+    t.currency,
+    t.amount,
+    t.message,
+    t.created_at,
+    t.network,
+    t.status,
+    -- Mask wallet addresses for privacy
+    CASE 
+      WHEN LENGTH(t.wallet_address) > 8 
+      THEN CONCAT(SUBSTRING(t.wallet_address, 1, 6), '...', SUBSTRING(t.wallet_address, LENGTH(t.wallet_address) - 3))
+      ELSE t.wallet_address
+    END as masked_wallet_address,
+    CASE 
+      WHEN LENGTH(COALESCE(t.artist_wallet_address, '')) > 8 
+      THEN CONCAT(SUBSTRING(t.artist_wallet_address, 1, 6), '...', SUBSTRING(t.artist_wallet_address, LENGTH(t.artist_wallet_address) - 3))
+      ELSE t.artist_wallet_address
+    END as masked_artist_wallet_address
+  FROM public.artist_tips t
+  WHERE t.status = 'confirmed';
+$$;
