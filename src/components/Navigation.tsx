@@ -16,11 +16,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import SearchBar from '@/components/SearchBar';
 import { WalletConnectionDialog } from '@/components/WalletConnectionDialog';
+import MobileNavigation from '@/components/MobileNavigation';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Navigation: React.FC = () => {
   const { user, signOut } = useAuth();
   const { play } = usePlayer();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // Wallet states
   const { address: ethAddress, isConnected: isEthConnected } = useAccount();
@@ -46,8 +49,11 @@ const Navigation: React.FC = () => {
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Mobile Navigation */}
+        {isMobile && <MobileNavigation />}
+        
         {/* Logo & Navigation */}
-        <div className="flex items-center gap-8">
+        <div className={`flex items-center ${isMobile ? 'gap-4' : 'gap-8'}`}>
           <div className="flex items-center gap-3">
             <Link to="/">
               <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
@@ -66,8 +72,8 @@ const Navigation: React.FC = () => {
             </div>
           </div>
           
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* Navigation Links - Hidden on mobile */}
+          <div className="hidden lg:flex items-center gap-6">
             <Link to="/trending">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 Trending
@@ -110,8 +116,8 @@ const Navigation: React.FC = () => {
           </div>
         </div>
 
-        {/* Search */}
-        <div className="flex-1 max-w-md mx-8">
+        {/* Search - Hidden on mobile */}
+        <div className={`flex-1 max-w-md mx-8 ${isMobile ? 'hidden' : ''}`}>
           <SearchBar 
             onTrackSelect={handleTrackSelect}
             onUserSelect={handleUserSelect}
@@ -121,7 +127,7 @@ const Navigation: React.FC = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {user && ethBalance && (
+          {user && ethBalance && !isMobile && (
             <Button variant="ghost" size="sm">
               <Zap className="h-4 w-4 mr-1" />
               {parseFloat(ethBalance.formatted).toFixed(3)} {ethBalance.symbol}
@@ -129,25 +135,27 @@ const Navigation: React.FC = () => {
           )}
           
           {user ? (
-            <>
-              <WalletConnectionDialog>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className={`gradient-accent border-accent text-accent-foreground hover:scale-105 transition-bounce ${
-                    (isEthConnected || isSolConnected) ? 'bg-accent/20' : ''
-                  }`}
-                >
-                  <Wallet className="h-4 w-4 mr-1" />
-                  {isEthConnected || isSolConnected ? 'Wallet Connected' : 'Connect Wallet'}
-                </Button>
-              </WalletConnectionDialog>
+            <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
+              {!isMobile && (
+                <WalletConnectionDialog>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className={`gradient-accent border-accent text-accent-foreground hover:scale-105 transition-bounce ${
+                      (isEthConnected || isSolConnected) ? 'bg-accent/20' : ''
+                    }`}
+                  >
+                    <Wallet className="h-4 w-4 mr-1" />
+                    {isEthConnected || isSolConnected ? 'Wallet Connected' : 'Connect Wallet'}
+                  </Button>
+                </WalletConnectionDialog>
+              )}
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm">
                     <User className="h-4 w-4 mr-1" />
-                    Profile
+                    {!isMobile && 'Profile'}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -162,16 +170,12 @@ const Navigation: React.FC = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
+            </div>
           ) : (
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="outline" size={isMobile ? "sm" : "sm"}>
               <Link to="/auth">Sign In</Link>
             </Button>
           )}
-          
-          <Button variant="ghost" size="sm" className="md:hidden">
-            <Menu className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     </nav>

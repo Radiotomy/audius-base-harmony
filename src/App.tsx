@@ -7,6 +7,8 @@ import { OnchainProvider } from "@/contexts/OnchainKitProvider";
 import { SolanaProvider } from "@/contexts/SolanaContext";
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Navigation from "@/components/Navigation";
+import MobileAudioPlayer from "@/components/MobileAudioPlayer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Trending from "./pages/Trending";
@@ -31,7 +33,10 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                <Routes>
+                <div className="min-h-screen bg-background">
+                  <Navigation />
+                  <main className="pb-20 lg:pb-8">
+                    <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/trending" element={<Trending />} />
@@ -46,7 +51,10 @@ const App = () => (
                   <Route path="/nft-studio" element={<NFTStudio />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
-                </Routes>
+                    </Routes>
+                  </main>
+                  <MobileAudioPlayer />
+                </div>
               </BrowserRouter>
             </TooltipProvider>
           </PlayerProvider>
