@@ -467,6 +467,201 @@ export type Database = {
           },
         ]
       }
+      nft_collections: {
+        Row: {
+          artist_id: string
+          contract_address: string | null
+          created_at: string
+          current_supply: number | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          max_supply: number | null
+          name: string
+          network: string
+          royalty_percentage: number | null
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          contract_address?: string | null
+          created_at?: string
+          current_supply?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_supply?: number | null
+          name: string
+          network?: string
+          royalty_percentage?: number | null
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          contract_address?: string | null
+          created_at?: string
+          current_supply?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_supply?: number | null
+          name?: string
+          network?: string
+          royalty_percentage?: number | null
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nft_listings: {
+        Row: {
+          buyer_address: string | null
+          created_at: string
+          currency: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          price: number
+          seller_address: string
+          sold_at: string | null
+          token_id: string
+        }
+        Insert: {
+          buyer_address?: string | null
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          price: number
+          seller_address: string
+          sold_at?: string | null
+          token_id: string
+        }
+        Update: {
+          buyer_address?: string | null
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          price?: number
+          seller_address?: string
+          sold_at?: string | null
+          token_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nft_listings_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "nft_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nft_royalties: {
+        Row: {
+          amount_earned: number | null
+          created_at: string
+          id: string
+          last_payout_at: string | null
+          percentage: number
+          recipient_address: string
+          token_id: string
+        }
+        Insert: {
+          amount_earned?: number | null
+          created_at?: string
+          id?: string
+          last_payout_at?: string | null
+          percentage: number
+          recipient_address: string
+          token_id: string
+        }
+        Update: {
+          amount_earned?: number | null
+          created_at?: string
+          id?: string
+          last_payout_at?: string | null
+          percentage?: number
+          recipient_address?: string
+          token_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nft_royalties_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "nft_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nft_tokens: {
+        Row: {
+          collection_id: string
+          created_at: string
+          creator_address: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_for_sale: boolean | null
+          metadata_uri: string | null
+          name: string
+          owner_address: string
+          price: number | null
+          royalty_percentage: number | null
+          token_id: string
+          track_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          collection_id: string
+          created_at?: string
+          creator_address: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_for_sale?: boolean | null
+          metadata_uri?: string | null
+          name: string
+          owner_address: string
+          price?: number | null
+          royalty_percentage?: number | null
+          token_id: string
+          track_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          collection_id?: string
+          created_at?: string
+          creator_address?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_for_sale?: boolean | null
+          metadata_uri?: string | null
+          name?: string
+          owner_address?: string
+          price?: number | null
+          royalty_percentage?: number | null
+          token_id?: string
+          track_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nft_tokens_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "nft_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playlist_collaborators: {
         Row: {
           added_by: string

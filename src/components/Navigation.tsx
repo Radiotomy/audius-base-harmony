@@ -90,11 +90,21 @@ const Navigation: React.FC = () => {
                     Dashboard
                   </Button>
                 </Link>
-                <Link to="/wallet">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                    Wallet
-                  </Button>
-                </Link>
+            <Link to="/wallet">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Wallet
+              </Button>
+            </Link>
+            <Link to="/nft-marketplace">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                NFT Market
+              </Button>
+            </Link>
+            <Link to="/nft-studio">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                NFT Studio
+              </Button>
+            </Link>
               </>
             )}
           </div>
