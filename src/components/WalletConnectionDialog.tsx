@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Wallet, Copy, RefreshCw } from 'lucide-react';
 import { useAccount, useBalance, useDisconnect } from 'wagmi';
-import { ConnectWallet, Wallet as OnchainWallet, WalletDropdown } from '@coinbase/onchainkit/wallet';
-import { Avatar, Name, Identity, Address } from '@coinbase/onchainkit/identity';
+import { ConnectWallet, Wallet as OnchainWallet, WalletDropdown, WalletDropdownLink, WalletDropdownDisconnect } from '@coinbase/onchainkit/wallet';
+import { Avatar, Name, Identity, Address, EthBalance } from '@coinbase/onchainkit/identity';
+import { Color, Chain } from '@coinbase/onchainkit/token';
 import { useSolana } from '@/contexts/SolanaContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -89,40 +90,33 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
             ) : (
               <div className="space-y-4">
                 <div className="p-4 rounded-lg border border-border bg-background">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Identity address={ethAddress} className="flex items-center gap-2">
-                      <Avatar />
-                      <div className="flex flex-col">
-                        <Name />
-                        <Address />
+                  <OnchainWallet>
+                    <div className="flex items-center gap-3 mb-3">
+                      <Identity address={ethAddress} className="flex items-center gap-2">
+                        <Avatar />
+                        <div className="flex flex-col">
+                          <Name />
+                          <Address />
+                        </div>
+                      </Identity>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Balance</p>
+                        <EthBalance />
                       </div>
-                    </Identity>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Balance</p>
-                      <p className="font-semibold">
-                        {ethBalance ? `${formatBalance(ethBalance.formatted)} ${ethBalance.symbol}` : '0 ETH'}
-                      </p>
+                      <WalletDropdown>
+                        <Button variant="outline" size="sm">
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <WalletDropdownLink icon="wallet" href="https://keys.coinbase.com">
+                          Wallet
+                        </WalletDropdownLink>
+                        <WalletDropdownDisconnect />
+                      </WalletDropdown>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(ethAddress!, 'Ethereum')}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => disconnectEth()}
-                      >
-                        Disconnect
-                      </Button>
-                    </div>
-                  </div>
+                  </OnchainWallet>
                 </div>
               </div>
             )}
