@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Wallet, Menu, Zap, LogOut, User } from 'lucide-react';
+import audiobaseLogo from '@/assets/audiobase-logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { audiusService } from '@/services/audius';
@@ -55,21 +56,21 @@ const Navigation: React.FC = () => {
         {/* Logo & Navigation */}
         <div className={`flex items-center ${isMobile ? 'gap-4' : 'gap-8'}`}>
           <div className="flex items-center gap-3">
-            <Link to="/">
-              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-foreground">AB</span>
-              </div>
-            </Link>
-            <div>
-              <Link to="/">
+            <Link to="/" className="flex items-center gap-3">
+              <img 
+                src={audiobaseLogo} 
+                alt="AudioBASE Logo" 
+                className="w-10 h-10 rounded-lg"
+              />
+              <div>
                 <h1 className="text-lg font-bold gradient-primary bg-clip-text text-transparent">
                   AudioBASE
                 </h1>
-              </Link>
-              <p className="text-xs text-muted-foreground -mt-1">
-                Audius × Base
-              </p>
-            </div>
+                <p className="text-xs text-muted-foreground -mt-1">
+                  Audius × Base
+                </p>
+              </div>
+            </Link>
           </div>
           
           {/* Navigation Links - Hidden on mobile */}

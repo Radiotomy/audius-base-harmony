@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Search, Home, TrendingUp, Users, Briefcase, Wallet, ShoppingBag, Palette } from 'lucide-react';
+import audiobaseLogo from '@/assets/audiobase-logo.png';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
@@ -45,9 +46,11 @@ const MobileNavigation = () => {
             <div className="p-4 border-b border-border">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-sm">AB</span>
-                  </div>
+                  <img 
+                    src={audiobaseLogo} 
+                    alt="AudioBASE Logo" 
+                    className="h-8 w-8 rounded-lg"
+                  />
                   <span className="font-bold text-lg">AudioBASE</span>
                 </div>
                 <SheetClose asChild>
