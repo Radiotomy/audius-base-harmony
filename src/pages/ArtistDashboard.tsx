@@ -16,6 +16,10 @@ import { TrackUploadDialog } from '@/components/TrackUploadDialog';
 import { AlbumCreationDialog } from '@/components/AlbumCreationDialog';
 import { MerchandiseManager } from '@/components/MerchandiseManager';
 import { ArtistEarningsWidget } from '@/components/ArtistEarningsWidget';
+import { ActivityFeed } from '@/components/ActivityFeed';
+import { AnalyticsChart } from '@/components/AnalyticsChart';
+import { TrackManager } from '@/components/TrackManager';
+import { AlbumManager } from '@/components/AlbumManager';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useArtistUploads } from '@/hooks/useArtistUploads';
@@ -166,10 +170,12 @@ const ArtistDashboard: React.FC = () => {
                       Create Album
                     </Button>
                   </AlbumCreationDialog>
-                  <Button variant="outline" className="w-full justify-start" size="lg">
-                    <Image className="h-4 w-4 mr-2" />
-                    Upload Cover Art
-                  </Button>
+                  <Link to="/music-management">
+                    <Button variant="outline" className="w-full justify-start" size="lg">
+                      <Music className="h-4 w-4 mr-2" />
+                      Manage Music
+                    </Button>
+                  </Link>
                   <Button variant="outline" className="w-full justify-start" size="lg">
                     <ShoppingBag className="h-4 w-4 mr-2" />
                     Add Merchandise
@@ -177,38 +183,15 @@ const ArtistDashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Recent Activity */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentActivity.length === 0 ? (
-                      <div className="text-center py-4 text-muted-foreground">
-                        <p>No recent activity</p>
-                      </div>
-                    ) : (
-                      recentActivity.slice(0, 3).map((activity) => (
-                        <div key={activity.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                            {activity.type === 'upload' && <Upload className="h-4 w-4 text-green-600" />}
-                            {activity.type === 'tip' && <DollarSign className="h-4 w-4 text-purple-600" />}
-                            {activity.type === 'follow' && <Users className="h-4 w-4 text-blue-600" />}
-                            {activity.type === 'album_create' && <Album className="h-4 w-4 text-orange-600" />}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{activity.title}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(activity.timestamp).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Recent Activity with Enhanced Feed */}
+              <ActivityFeed 
+                activities={recentActivity} 
+                loading={statsLoading}
+                onViewAll={() => {
+                  // Could implement a full activity page
+                  console.log('View all activities');
+                }}
+              />
             </div>
 
             {/* Earnings Widget */}
@@ -216,102 +199,7 @@ const ArtistDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="music" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">My Music</h2>
-              <div className="flex gap-2">
-                <TrackUploadDialog 
-                  onSuccess={() => {
-                    addActivity('upload', 'New track uploaded', 'Successfully uploaded a new track');
-                  }}
-                >
-                  <Button>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Track
-                  </Button>
-                </TrackUploadDialog>
-                <AlbumCreationDialog
-                  onSuccess={() => {
-                    addActivity('album_create', 'New album created', 'Successfully created a new album');
-                  }}
-                >
-                  <Button variant="outline">
-                    <Album className="h-4 w-4 mr-2" />
-                    Create Album
-                  </Button>
-                </AlbumCreationDialog>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Tracks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {stats.trackCount === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="mb-2">No tracks uploaded yet</p>
-                      <TrackUploadDialog>
-                        <Button size="sm">
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload Your First Track
-                        </Button>
-                      </TrackUploadDialog>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Published</span>
-                        <span className="font-semibold">{uploadStats.published}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Draft</span>
-                        <span className="font-semibold">{uploadStats.draft}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Processing</span>
-                        <span className="font-semibold">{uploadStats.processing}</span>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Albums & EPs</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {stats.albumCount === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Album className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="mb-2">No albums created yet</p>
-                      <AlbumCreationDialog>
-                        <Button size="sm" variant="outline">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create Album
-                        </Button>
-                      </AlbumCreationDialog>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {albums.slice(0, 3).map((album) => (
-                        <div key={album.id} className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-muted rounded-md flex items-center justify-center">
-                            <Album className="h-5 w-5" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{album.title}</p>
-                            <p className="text-xs text-muted-foreground capitalize">{album.album_type}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+            <TrackManager onTrackSelect={(track) => console.log('Edit track:', track)} />
           </TabsContent>
 
           <TabsContent value="media" className="space-y-6">
@@ -419,39 +307,7 @@ const ArtistDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Analytics & Insights</h2>
-              <Button variant="outline">
-                <Eye className="h-4 w-4 mr-2" />
-                Detailed Analytics
-              </Button>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Listening Stats</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Headphones className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No listening data yet</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Fan Engagement</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No engagement data yet</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <AnalyticsChart />
           </TabsContent>
         </Tabs>
       </div>
