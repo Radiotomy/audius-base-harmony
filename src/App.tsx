@@ -6,35 +6,40 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { OnchainProvider } from "@/contexts/OnchainKitProvider";
 import { SolanaProvider } from "@/contexts/SolanaContext";
 import { PlayerProvider } from "@/contexts/PlayerContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Trending from "./pages/Trending";
 import Artists from "./pages/Artists";
+import SearchResults from "./pages/SearchResults";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
-  <AuthProvider>
-    <OnchainProvider>
-      <SolanaProvider>
-        <PlayerProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/trending" element={<Trending />} />
-                <Route path="/artists" element={<Artists />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </PlayerProvider>
-      </SolanaProvider>
-    </OnchainProvider>
-  </AuthProvider>
+  <ErrorBoundary>
+    <AuthProvider>
+      <OnchainProvider>
+        <SolanaProvider>
+          <PlayerProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/trending" element={<Trending />} />
+                  <Route path="/artists" element={<Artists />} />
+                  <Route path="/search" element={<SearchResults />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </PlayerProvider>
+        </SolanaProvider>
+      </OnchainProvider>
+    </AuthProvider>
+  </ErrorBoundary>
 );
 
 export default App;

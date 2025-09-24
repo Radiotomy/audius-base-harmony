@@ -12,6 +12,8 @@ export interface Track {
   audiusId?: string;
 }
 
+export type RepeatMode = 'none' | 'track' | 'playlist';
+
 export interface PlayerState {
   currentTrack: Track | null;
   isPlaying: boolean;
@@ -22,6 +24,12 @@ export interface PlayerState {
   queue: Track[];
   currentIndex: number;
   isLoading: boolean;
+  repeatMode: RepeatMode;
+  isShuffled: boolean;
+  playbackSpeed: number;
+  crossfadeEnabled: boolean;
+  crossfadeDuration: number;
+  originalQueue: Track[];
 }
 
 interface PlayerContextType extends PlayerState {
@@ -33,6 +41,11 @@ interface PlayerContextType extends PlayerState {
   setVolume: (volume: number) => void;
   addToQueue: (track: Track) => void;
   removeFromQueue: (trackId: string) => void;
+  setRepeatMode: (mode: RepeatMode) => void;
+  toggleShuffle: () => void;
+  setPlaybackSpeed: (speed: number) => void;
+  setCrossfade: (enabled: boolean, duration?: number) => void;
+  clearQueue: () => void;
   webAudio: {
     isInitialized: boolean;
     analyserData: Uint8Array;
@@ -52,12 +65,18 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     currentTrack: null,
     isPlaying: false,
     progress: 0,
-    volume: 70,
+    volume: typeof window !== 'undefined' ? parseInt(localStorage.getItem('audiobase-volume') || '70') : 70,
     duration: 0,
     currentTime: 0,
     queue: [],
     currentIndex: -1,
     isLoading: false,
+    repeatMode: 'none',
+    isShuffled: false,
+    playbackSpeed: 1.0,
+    crossfadeEnabled: false,
+    crossfadeDuration: 3,
+    originalQueue: [],
   });
 
   // Initialize Web Audio API
@@ -95,8 +114,13 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       };
 
       const handleEnded = () => {
-        console.log('🔚 Track ended, playing next');
-        next();
+        console.log('🔚 Track ended, checking repeat mode');
+        if (state.repeatMode === 'track') {
+          audio.currentTime = 0;
+          audio.play();
+        } else {
+          next();
+        }
       };
 
       const handleError = (e: Event) => {
@@ -248,11 +272,15 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (nextIndex < state.queue.length) {
       const nextTrack = state.queue[nextIndex];
       play(nextTrack, state.queue, true);
+    } else if (state.repeatMode === 'playlist' && state.queue.length > 0) {
+      // Restart playlist
+      const firstTrack = state.queue[0];
+      play(firstTrack, state.queue, true);
     } else {
       console.log('🔚 End of queue reached');
       setState(prev => ({ ...prev, isPlaying: false }));
     }
-  }, [state.currentIndex, state.queue, play]);
+  }, [state.currentIndex, state.queue, state.repeatMode, play]);
 
   const previous = useCallback(() => {
     const prevIndex = state.currentIndex - 1;
@@ -274,6 +302,8 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (audioRef.current) {
       audioRef.current.volume = volume / 100;
     }
+    // Save volume to localStorage
+    localStorage.setItem('audiobase-volume', volume.toString());
   }, []);
 
   const addToQueue = useCallback((track: Track) => {
@@ -317,6 +347,103 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   }, []);
 
+  const shuffleArray = useCallback((array: Track[]) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, []);
+
+  const setRepeatMode = useCallback((mode: RepeatMode) => {
+    setState(prev => ({ ...prev, repeatMode: mode }));
+    toast({
+      title: "Repeat Mode",
+      description: `Repeat ${mode === 'none' ? 'off' : mode === 'track' ? 'track' : 'playlist'}`,
+    });
+  }, []);
+
+  const toggleShuffle = useCallback(() => {
+    setState(prev => {
+      if (!prev.isShuffled) {
+        // Enable shuffle
+        const currentTrack = prev.currentTrack;
+        const shuffledQueue = shuffleArray(prev.queue);
+        const newIndex = currentTrack ? shuffledQueue.findIndex(t => t.id === currentTrack.id) : -1;
+        
+        return {
+          ...prev,
+          isShuffled: true,
+          originalQueue: prev.queue,
+          queue: shuffledQueue,
+          currentIndex: newIndex,
+        };
+      } else {
+        // Disable shuffle
+        const currentTrack = prev.currentTrack;
+        const originalIndex = currentTrack ? prev.originalQueue.findIndex(t => t.id === currentTrack.id) : -1;
+        
+        return {
+          ...prev,
+          isShuffled: false,
+          queue: prev.originalQueue,
+          currentIndex: originalIndex,
+          originalQueue: [],
+        };
+      }
+    });
+
+    toast({
+      title: "Shuffle",
+      description: state.isShuffled ? "Shuffle off" : "Shuffle on",
+    });
+  }, [state.isShuffled, shuffleArray]);
+
+  const setPlaybackSpeed = useCallback((speed: number) => {
+    setState(prev => ({ ...prev, playbackSpeed: speed }));
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+    toast({
+      title: "Playback Speed",
+      description: `${speed}x speed`,
+    });
+  }, []);
+
+  const setCrossfade = useCallback((enabled: boolean, duration: number = 3) => {
+    setState(prev => ({ 
+      ...prev, 
+      crossfadeEnabled: enabled,
+      crossfadeDuration: duration 
+    }));
+    toast({
+      title: "Crossfade",
+      description: enabled ? `Enabled (${duration}s)` : "Disabled",
+    });
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      queue: prev.currentTrack ? [prev.currentTrack] : [],
+      originalQueue: [],
+      currentIndex: prev.currentTrack ? 0 : -1,
+      isShuffled: false,
+    }));
+    toast({
+      title: "Queue Cleared",
+      description: "All tracks removed from queue",
+    });
+  }, []);
+
+  // Apply playback speed when audio element changes
+  useEffect(() => {
+    if (audioRef.current && state.playbackSpeed !== 1.0) {
+      audioRef.current.playbackRate = state.playbackSpeed;
+    }
+  }, [state.currentTrack, state.playbackSpeed]);
+
   const value: PlayerContextType = {
     ...state,
     play,
@@ -327,6 +454,11 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setVolume,
     addToQueue,
     removeFromQueue,
+    setRepeatMode,
+    toggleShuffle,
+    setPlaybackSpeed,
+    setCrossfade,
+    clearQueue,
     webAudio,
     audioElement: audioRef.current,
   };

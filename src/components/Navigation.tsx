@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Search, Wallet, Menu, Zap, LogOut, User } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Wallet, Menu, Zap, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { usePlayer } from '@/contexts/PlayerContext';
+import { audiusService } from '@/services/audius';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +12,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import WaveformVisualizer from './WaveformVisualizer';
+import SearchBar from '@/components/SearchBar';
 
 const Navigation: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { play } = usePlayer();
+  const navigate = useNavigate();
+
+  const handleTrackSelect = async (track: any) => {
+    const transformedTrack = {
+      id: track.id,
+      title: track.title,
+      artist: track.user?.name || 'Unknown Artist',
+      duration: `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}`,
+      cover: track.artwork?.['480x480'] || track.artwork?.['150x150'],
+      audiusId: track.id,
+    };
+    await play(transformedTrack, [transformedTrack], true);
+  };
+
+  const handleUserSelect = (user: any) => {
+    navigate(`/search?q=${encodeURIComponent(user.name)}&type=users`);
+  };
 
   return (
     <nav className="border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-50">
@@ -56,13 +75,11 @@ const Navigation: React.FC = () => {
 
         {/* Search */}
         <div className="flex-1 max-w-md mx-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search tracks, artists, playlists..."
-              className="pl-10 bg-muted border-border"
-            />
-          </div>
+          <SearchBar 
+            onTrackSelect={handleTrackSelect}
+            onUserSelect={handleUserSelect}
+            className="w-full"
+          />
         </div>
 
         {/* Actions */}
