@@ -5,6 +5,8 @@ import { Wallet, Menu, Zap, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { audiusService } from '@/services/audius';
+import { useAccount, useBalance } from 'wagmi';
+import { useSolana } from '@/contexts/SolanaContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,11 +15,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SearchBar from '@/components/SearchBar';
+import { WalletConnectionDialog } from '@/components/WalletConnectionDialog';
 
 const Navigation: React.FC = () => {
   const { user, signOut } = useAuth();
   const { play } = usePlayer();
   const navigate = useNavigate();
+  
+  // Wallet states
+  const { address: ethAddress, isConnected: isEthConnected } = useAccount();
+  const { data: ethBalance } = useBalance({ address: ethAddress });
+  const { connected: isSolConnected } = useSolana();
 
   const handleTrackSelect = async (track: any) => {
     const transformedTrack = {
@@ -96,23 +104,27 @@ const Navigation: React.FC = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {user && (
+          {user && ethBalance && (
             <Button variant="ghost" size="sm">
               <Zap className="h-4 w-4 mr-1" />
-              0.5 ETH
+              {parseFloat(ethBalance.formatted).toFixed(3)} {ethBalance.symbol}
             </Button>
           )}
           
           {user ? (
             <>
-              <Button 
-                variant="outline"
-                size="sm"
-                className="gradient-accent border-accent text-accent-foreground hover:scale-105 transition-bounce"
-              >
-                <Wallet className="h-4 w-4 mr-1" />
-                Connect
-              </Button>
+              <WalletConnectionDialog>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className={`gradient-accent border-accent text-accent-foreground hover:scale-105 transition-bounce ${
+                    (isEthConnected || isSolConnected) ? 'bg-accent/20' : ''
+                  }`}
+                >
+                  <Wallet className="h-4 w-4 mr-1" />
+                  {isEthConnected || isSolConnected ? 'Wallet Connected' : 'Connect Wallet'}
+                </Button>
+              </WalletConnectionDialog>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
