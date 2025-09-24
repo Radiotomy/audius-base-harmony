@@ -6,7 +6,6 @@ import { Wallet, Copy, RefreshCw } from 'lucide-react';
 import { useAccount, useBalance, useDisconnect } from 'wagmi';
 import { ConnectWallet, Wallet as OnchainWallet, WalletDropdown, WalletDropdownLink, WalletDropdownDisconnect } from '@coinbase/onchainkit/wallet';
 import { Avatar, Name, Identity, Address, EthBalance } from '@coinbase/onchainkit/identity';
-import { Color, Chain } from '@coinbase/onchainkit/token';
 import { useSolana } from '@/contexts/SolanaContext';
 import { useToast } from '@/hooks/use-toast';
 

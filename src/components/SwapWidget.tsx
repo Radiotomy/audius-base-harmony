@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { ArrowUpDown, Info } from 'lucide-react';
 import { Swap, SwapAmountInput, SwapToggleButton, SwapButton, SwapMessage } from '@coinbase/onchainkit/swap';
 import { TokenSelectDropdown, Token } from '@coinbase/onchainkit/token';
@@ -52,23 +53,15 @@ export const SwapWidget: React.FC = () => {
               </div>
             </div>
 
-            <Swap>
-              <SwapAmountInput
-                label="Sell"
-                swappableTokens={swappableTokens}
-                token={ETH_TOKEN}
-                type="from"
-              />
-              <SwapToggleButton />
-              <SwapAmountInput
-                label="Buy"
-                swappableTokens={swappableTokens}
-                token={USDC_TOKEN}
-                type="to"
-              />
-              <SwapButton className="w-full gradient-primary" />
-              <SwapMessage />
-            </Swap>
+            <div className="p-4 rounded-lg border border-border">
+              <p className="text-center text-muted-foreground">
+                Token swap functionality coming soon
+              </p>
+              <Button className="w-full mt-3" variant="outline" disabled>
+                <ArrowUpDown className="h-4 w-4 mr-2" />
+                Swap ETH → USDC
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="text-center py-6">

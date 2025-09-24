@@ -38,51 +38,352 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_analytics: {
+        Row: {
+          artist_id: string
+          created_at: string | null
+          date: string
+          id: string
+          new_followers: number | null
+          platform: string
+          tip_count: number | null
+          total_plays: number | null
+          total_tips: number | null
+          track_shares: number | null
+          unique_listeners: number | null
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string | null
+          date: string
+          id?: string
+          new_followers?: number | null
+          platform: string
+          tip_count?: number | null
+          total_plays?: number | null
+          total_tips?: number | null
+          track_shares?: number | null
+          unique_listeners?: number | null
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          new_followers?: number | null
+          platform?: string
+          tip_count?: number | null
+          total_plays?: number | null
+          total_tips?: number | null
+          track_shares?: number | null
+          unique_listeners?: number | null
+        }
+        Relationships: []
+      }
+      artist_applications: {
+        Row: {
+          admin_notes: string | null
+          application_type: string
+          audius_handle: string | null
+          audius_user_id: string | null
+          bio: string
+          created_at: string | null
+          display_name: string
+          genres: string[]
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sample_tracks: Json | null
+          social_links: Json | null
+          status: string
+          submitted_at: string | null
+          updated_at: string | null
+          user_id: string
+          verification_documents: Json | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          application_type: string
+          audius_handle?: string | null
+          audius_user_id?: string | null
+          bio: string
+          created_at?: string | null
+          display_name: string
+          genres: string[]
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_tracks?: Json | null
+          social_links?: Json | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id: string
+          verification_documents?: Json | null
+        }
+        Update: {
+          admin_notes?: string | null
+          application_type?: string
+          audius_handle?: string | null
+          audius_user_id?: string | null
+          bio?: string
+          created_at?: string | null
+          display_name?: string
+          genres?: string[]
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_tracks?: Json | null
+          social_links?: Json | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verification_documents?: Json | null
+        }
+        Relationships: []
+      }
+      artist_earnings: {
+        Row: {
+          amount: number
+          artist_id: string
+          created_at: string
+          currency: string
+          id: string
+          processed_at: string | null
+          status: string
+          tip_id: string
+          transaction_hash: string | null
+        }
+        Insert: {
+          amount: number
+          artist_id: string
+          created_at?: string
+          currency: string
+          id?: string
+          processed_at?: string | null
+          status?: string
+          tip_id: string
+          transaction_hash?: string | null
+        }
+        Update: {
+          amount?: number
+          artist_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          processed_at?: string | null
+          status?: string
+          tip_id?: string
+          transaction_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_earnings_tip_id_fkey"
+            columns: ["tip_id"]
+            isOneToOne: false
+            referencedRelation: "artist_tips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_tips: {
         Row: {
           amount: number
+          artist_earnings_id: string | null
           artist_id: string
           artist_name: string
           artist_wallet_address: string | null
           confirmed_at: string | null
           created_at: string
           currency: string
+          gas_sponsored: boolean | null
           id: string
           message: string | null
+          network: string | null
           status: string
           transaction_hash: string | null
+          usd_value: number | null
           user_id: string
           wallet_address: string
         }
         Insert: {
           amount: number
+          artist_earnings_id?: string | null
           artist_id: string
           artist_name: string
           artist_wallet_address?: string | null
           confirmed_at?: string | null
           created_at?: string
           currency: string
+          gas_sponsored?: boolean | null
           id?: string
           message?: string | null
+          network?: string | null
           status?: string
           transaction_hash?: string | null
+          usd_value?: number | null
           user_id: string
           wallet_address: string
         }
         Update: {
           amount?: number
+          artist_earnings_id?: string | null
           artist_id?: string
           artist_name?: string
           artist_wallet_address?: string | null
           confirmed_at?: string | null
           created_at?: string
           currency?: string
+          gas_sponsored?: boolean | null
           id?: string
           message?: string | null
+          network?: string | null
           status?: string
           transaction_hash?: string | null
+          usd_value?: number | null
           user_id?: string
           wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_tips_earnings_fkey"
+            columns: ["artist_earnings_id"]
+            isOneToOne: false
+            referencedRelation: "artist_earnings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      artist_uploads: {
+        Row: {
+          artist_id: string
+          artwork_url: string | null
+          audio_file_url: string
+          bit_rate: number | null
+          copyright_info: string | null
+          created_at: string | null
+          description: string | null
+          download_count: number | null
+          duration: number | null
+          file_format: string | null
+          file_size: number | null
+          genre: string
+          id: string
+          is_explicit: boolean | null
+          license_type: string | null
+          play_count: number | null
+          published_at: string | null
+          sample_rate: number | null
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          uploaded_at: string | null
+        }
+        Insert: {
+          artist_id: string
+          artwork_url?: string | null
+          audio_file_url: string
+          bit_rate?: number | null
+          copyright_info?: string | null
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          duration?: number | null
+          file_format?: string | null
+          file_size?: number | null
+          genre: string
+          id?: string
+          is_explicit?: boolean | null
+          license_type?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          sample_rate?: number | null
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          uploaded_at?: string | null
+        }
+        Update: {
+          artist_id?: string
+          artwork_url?: string | null
+          audio_file_url?: string
+          bit_rate?: number | null
+          copyright_info?: string | null
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          duration?: number | null
+          file_format?: string | null
+          file_size?: number | null
+          genre?: string
+          id?: string
+          is_explicit?: boolean | null
+          license_type?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          sample_rate?: number | null
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          uploaded_at?: string | null
+        }
+        Relationships: []
+      }
+      audius_artist_claims: {
+        Row: {
+          audius_display_name: string | null
+          audius_follower_count: number | null
+          audius_handle: string
+          audius_track_count: number | null
+          audius_user_id: string
+          claim_status: string
+          created_at: string | null
+          id: string
+          last_sync_at: string | null
+          sync_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+          verification_data: Json | null
+          verification_method: string
+          verified_at: string | null
+        }
+        Insert: {
+          audius_display_name?: string | null
+          audius_follower_count?: number | null
+          audius_handle: string
+          audius_track_count?: number | null
+          audius_user_id: string
+          claim_status?: string
+          created_at?: string | null
+          id?: string
+          last_sync_at?: string | null
+          sync_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          verification_data?: Json | null
+          verification_method: string
+          verified_at?: string | null
+        }
+        Update: {
+          audius_display_name?: string | null
+          audius_follower_count?: number | null
+          audius_handle?: string
+          audius_track_count?: number | null
+          audius_user_id?: string
+          claim_status?: string
+          created_at?: string | null
+          id?: string
+          last_sync_at?: string | null
+          sync_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          verification_data?: Json | null
+          verification_method?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -242,34 +543,76 @@ export type Database = {
       }
       profiles: {
         Row: {
+          artist_bio: string | null
+          artist_location: string | null
+          artist_registration_type: string | null
+          artist_verified: boolean | null
           audius_handle: string | null
           audius_user_id: string | null
+          audius_verified: boolean | null
           avatar_url: string | null
+          base_wallet_address: string | null
           bio: string | null
           created_at: string | null
+          genres: string[] | null
           id: string
+          preferred_tip_currency: string | null
+          social_links: Json | null
+          tip_enabled: boolean | null
           updated_at: string | null
           username: string | null
+          verification_status: string | null
+          verified_at: string | null
+          wallet_address: string | null
+          website_url: string | null
         }
         Insert: {
+          artist_bio?: string | null
+          artist_location?: string | null
+          artist_registration_type?: string | null
+          artist_verified?: boolean | null
           audius_handle?: string | null
           audius_user_id?: string | null
+          audius_verified?: boolean | null
           avatar_url?: string | null
+          base_wallet_address?: string | null
           bio?: string | null
           created_at?: string | null
+          genres?: string[] | null
           id: string
+          preferred_tip_currency?: string | null
+          social_links?: Json | null
+          tip_enabled?: boolean | null
           updated_at?: string | null
           username?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          wallet_address?: string | null
+          website_url?: string | null
         }
         Update: {
+          artist_bio?: string | null
+          artist_location?: string | null
+          artist_registration_type?: string | null
+          artist_verified?: boolean | null
           audius_handle?: string | null
           audius_user_id?: string | null
+          audius_verified?: boolean | null
           avatar_url?: string | null
+          base_wallet_address?: string | null
           bio?: string | null
           created_at?: string | null
+          genres?: string[] | null
           id?: string
+          preferred_tip_currency?: string | null
+          social_links?: Json | null
+          tip_enabled?: boolean | null
           updated_at?: string | null
           username?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          wallet_address?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }

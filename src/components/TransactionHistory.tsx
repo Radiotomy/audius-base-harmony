@@ -14,7 +14,7 @@ interface Transaction {
   amount: number;
   currency: string;
   artist_name: string;
-  status: 'pending' | 'confirmed' | 'failed';
+  status: string;
   created_at: string;
   confirmed_at?: string;
   message?: string;
@@ -30,10 +30,13 @@ export const TransactionHistory: React.FC = () => {
     
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { data, error } = await supabase
         .from('artist_tips')
         .select('*')
-        .eq('wallet_address', address)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
 

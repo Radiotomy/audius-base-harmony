@@ -84,11 +84,18 @@ const Navigation: React.FC = () => {
               </Button>
             </Link>
             {user && (
-              <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                  Dashboard
-                </Button>
-              </Link>
+              <>
+                <Link to="/dashboard">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    Dashboard
+                  </Button>
+                </Link>
+                <Link to="/wallet">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    Wallet
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
         </div>

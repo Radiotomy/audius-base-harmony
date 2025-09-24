@@ -15,6 +15,7 @@ import SearchResults from "./pages/SearchResults";
 import Dashboard from "./pages/Dashboard";
 import DashboardProfile from "./pages/DashboardProfile";
 import { ArtistRegistration } from "./pages/ArtistRegistration";
+import WalletDashboard from "./pages/WalletDashboard";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -36,6 +37,7 @@ const App = () => (
                   <Route path="/search" element={<SearchResults />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/dashboard/profile" element={<DashboardProfile />} />
+                  <Route path="/wallet" element={<WalletDashboard />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

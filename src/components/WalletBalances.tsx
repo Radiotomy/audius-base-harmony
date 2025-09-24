@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Wallet, Zap, DollarSign } from 'lucide-react';
 import { useAccount, useBalance } from 'wagmi';
 import { useSolana } from '@/contexts/SolanaContext';
-import { EthBalance, TokenBalance } from '@coinbase/onchainkit/identity';
+import { EthBalance } from '@coinbase/onchainkit/identity';
 import { base } from 'wagmi/chains';
 
 interface TokenBalanceProps {
@@ -67,15 +67,12 @@ export const WalletBalances: React.FC = () => {
                 balance={ethBalance ? `${formatBalance(ethBalance.formatted)}` : '0.0000'}
               />
               
-              {/* USDC Balance on Base */}
-              {isOnBase && ethAddress && (
-                <div className="p-3 rounded-lg border border-border">
-                  <TokenBalance
-                    address={ethAddress}
-                    token="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" // USDC on Base
-                    className="flex items-center justify-between"
-                  />
-                </div>
+              {/* USDC Balance on Base - Coming Soon */}
+              {isOnBase && (
+                <TokenBalanceCard
+                  symbol="USDC"
+                  balance="0.0000"
+                />
               )}
             </div>
           </div>
