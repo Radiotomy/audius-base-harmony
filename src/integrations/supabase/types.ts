@@ -702,6 +702,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_events_artist_id"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_events_venue"
             columns: ["venue_id"]
             isOneToOne: false
@@ -710,6 +717,20 @@ export type Database = {
           },
           {
             foreignKeyName: "fk_events_venue"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_events_venue_id"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "public_venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_events_venue_id"
             columns: ["venue_id"]
             isOneToOne: false
             referencedRelation: "venues"
