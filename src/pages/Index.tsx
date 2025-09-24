@@ -113,9 +113,23 @@ const Index = () => {
             Stream Audius music seamlessly while tipping artists on Base. The future of Web3 music discovery.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="gradient-primary hover:scale-105 transition-bounce">
+            <Button 
+              size="lg" 
+              className="gradient-primary hover:scale-105 transition-bounce"
+              onClick={() => {
+                if (trendingTracks.length > 0) {
+                  handleTrackPlay(trendingTracks[0]);
+                } else {
+                  // Scroll to trending section if no tracks loaded yet
+                  document.querySelector('[data-section="trending"]')?.scrollIntoView({ 
+                    behavior: 'smooth' 
+                  });
+                }
+              }}
+              disabled={loading}
+            >
               <Play className="mr-2 h-5 w-5" />
-              Start Listening
+              {loading ? 'Loading...' : 'Start Listening'}
             </Button>
             <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-smooth">
               Connect Wallet
@@ -160,7 +174,7 @@ const Index = () => {
       </section>
 
       {/* Trending Tracks Section */}
-      <section className="py-16">
+      <section className="py-16" data-section="trending">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
