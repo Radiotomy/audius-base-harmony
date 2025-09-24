@@ -85,23 +85,6 @@ const Navigation: React.FC = () => {
                 Artists
               </Button>
             </Link>
-            <Link to="/artist-registration">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                Become an Artist
-              </Button>
-            </Link>
-            {user && (
-              <>
-                <Link to="/dashboard">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                    Dashboard
-                  </Button>
-                </Link>
-            <Link to="/wallet">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                Wallet
-              </Button>
-            </Link>
             <Link to="/events">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 Events
@@ -112,11 +95,28 @@ const Navigation: React.FC = () => {
                 NFT Market
               </Button>
             </Link>
-            <Link to="/nft-studio">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                NFT Studio
-              </Button>
-            </Link>
+            {user && (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    Dashboard
+                  </Button>
+                </Link>
+                <Link to="/wallet">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    Wallet
+                  </Button>
+                </Link>
+                <Link to="/nft-studio">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    NFT Studio
+                  </Button>
+                </Link>
+                <Link to="/artist-registration">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    Become an Artist
+                  </Button>
+                </Link>
               </>
             )}
           </div>
