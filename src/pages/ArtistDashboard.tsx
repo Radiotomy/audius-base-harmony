@@ -12,19 +12,30 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
 import { Link, Navigate } from 'react-router-dom';
+import { TrackUploadDialog } from '@/components/TrackUploadDialog';
+import { AlbumCreationDialog } from '@/components/AlbumCreationDialog';
+import { MerchandiseManager } from '@/components/MerchandiseManager';
 import { ArtistEarningsWidget } from '@/components/ArtistEarningsWidget';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useArtistUploads } from '@/hooks/useArtistUploads';
+import { useAlbums } from '@/hooks/useAlbums';
 
 const ArtistDashboard: React.FC = () => {
   const { user } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
   const { profile, loading: profileLoading } = useProfile(user?.id);
+  const { stats, recentActivity, loading: statsLoading, addActivity } = useDashboardStats();
+  const { uploads, getUploadStats } = useArtistUploads();
+  const { albums } = useAlbums();
+
+  const uploadStats = getUploadStats();
 
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (roleLoading || profileLoading) {
+  if (roleLoading || profileLoading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -77,7 +88,7 @@ const ArtistDashboard: React.FC = () => {
                       <Music className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">12</p>
+                      <p className="text-2xl font-bold">{stats.trackCount}</p>
                       <p className="text-xs text-muted-foreground">Tracks</p>
                     </div>
                   </div>
@@ -91,7 +102,7 @@ const ArtistDashboard: React.FC = () => {
                       <Album className="h-5 w-5 text-blue-500" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">3</p>
+                      <p className="text-2xl font-bold">{stats.albumCount}</p>
                       <p className="text-xs text-muted-foreground">Albums</p>
                     </div>
                   </div>
@@ -105,7 +116,7 @@ const ArtistDashboard: React.FC = () => {
                       <Users className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">1.2k</p>
+                      <p className="text-2xl font-bold">{stats.followerCount}</p>
                       <p className="text-xs text-muted-foreground">Followers</p>
                     </div>
                   </div>
@@ -119,7 +130,7 @@ const ArtistDashboard: React.FC = () => {
                       <Play className="h-5 w-5 text-purple-500" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">15.3k</p>
+                      <p className="text-2xl font-bold">{stats.totalPlays.toLocaleString()}</p>
                       <p className="text-xs text-muted-foreground">Plays</p>
                     </div>
                   </div>
@@ -135,14 +146,26 @@ const ArtistDashboard: React.FC = () => {
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full justify-start" size="lg">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload New Track
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start" size="lg">
-                    <Album className="h-4 w-4 mr-2" />
-                    Create Album
-                  </Button>
+                  <TrackUploadDialog 
+                    onSuccess={() => {
+                      addActivity('upload', 'New track uploaded', 'Successfully uploaded a new track');
+                    }}
+                  >
+                    <Button className="w-full justify-start" size="lg">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload New Track
+                    </Button>
+                  </TrackUploadDialog>
+                  <AlbumCreationDialog
+                    onSuccess={() => {
+                      addActivity('album_create', 'New album created', 'Successfully created a new album');
+                    }}
+                  >
+                    <Button variant="outline" className="w-full justify-start" size="lg">
+                      <Album className="h-4 w-4 mr-2" />
+                      Create Album
+                    </Button>
+                  </AlbumCreationDialog>
                   <Button variant="outline" className="w-full justify-start" size="lg">
                     <Image className="h-4 w-4 mr-2" />
                     Upload Cover Art
@@ -161,33 +184,28 @@ const ArtistDashboard: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                        <Upload className="h-4 w-4 text-green-600" />
+                    {recentActivity.length === 0 ? (
+                      <div className="text-center py-4 text-muted-foreground">
+                        <p>No recent activity</p>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Track uploaded successfully</p>
-                        <p className="text-xs text-muted-foreground">2 hours ago</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Users className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">25 new followers</p>
-                        <p className="text-xs text-muted-foreground">1 day ago</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-                        <DollarSign className="h-4 w-4 text-purple-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Received tip: 0.05 ETH</p>
-                        <p className="text-xs text-muted-foreground">3 days ago</p>
-                      </div>
-                    </div>
+                    ) : (
+                      recentActivity.slice(0, 3).map((activity) => (
+                        <div key={activity.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                            {activity.type === 'upload' && <Upload className="h-4 w-4 text-green-600" />}
+                            {activity.type === 'tip' && <DollarSign className="h-4 w-4 text-purple-600" />}
+                            {activity.type === 'follow' && <Users className="h-4 w-4 text-blue-600" />}
+                            {activity.type === 'album_create' && <Album className="h-4 w-4 text-orange-600" />}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{activity.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(activity.timestamp).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -201,14 +219,26 @@ const ArtistDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">My Music</h2>
               <div className="flex gap-2">
-                <Button>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Track
-                </Button>
-                <Button variant="outline">
-                  <Album className="h-4 w-4 mr-2" />
-                  Create Album
-                </Button>
+                <TrackUploadDialog 
+                  onSuccess={() => {
+                    addActivity('upload', 'New track uploaded', 'Successfully uploaded a new track');
+                  }}
+                >
+                  <Button>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Track
+                  </Button>
+                </TrackUploadDialog>
+                <AlbumCreationDialog
+                  onSuccess={() => {
+                    addActivity('album_create', 'New album created', 'Successfully created a new album');
+                  }}
+                >
+                  <Button variant="outline">
+                    <Album className="h-4 w-4 mr-2" />
+                    Create Album
+                  </Button>
+                </AlbumCreationDialog>
               </div>
             </div>
 
@@ -218,14 +248,33 @@ const ArtistDashboard: React.FC = () => {
                   <CardTitle>Recent Tracks</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="mb-2">No tracks uploaded yet</p>
-                    <Button size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Your First Track
-                    </Button>
-                  </div>
+                  {stats.trackCount === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="mb-2">No tracks uploaded yet</p>
+                      <TrackUploadDialog>
+                        <Button size="sm">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Your First Track
+                        </Button>
+                      </TrackUploadDialog>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Published</span>
+                        <span className="font-semibold">{uploadStats.published}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Draft</span>
+                        <span className="font-semibold">{uploadStats.draft}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Processing</span>
+                        <span className="font-semibold">{uploadStats.processing}</span>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -234,14 +283,32 @@ const ArtistDashboard: React.FC = () => {
                   <CardTitle>Albums & EPs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Album className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="mb-2">No albums created yet</p>
-                    <Button size="sm" variant="outline">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Album
-                    </Button>
-                  </div>
+                  {stats.albumCount === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Album className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="mb-2">No albums created yet</p>
+                      <AlbumCreationDialog>
+                        <Button size="sm" variant="outline">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Album
+                        </Button>
+                      </AlbumCreationDialog>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {albums.slice(0, 3).map((album) => (
+                        <div key={album.id} className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-muted rounded-md flex items-center justify-center">
+                            <Album className="h-5 w-5" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{album.title}</p>
+                            <p className="text-xs text-muted-foreground capitalize">{album.album_type}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -296,27 +363,7 @@ const ArtistDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="merch" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Merchandise</h2>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Product
-              </Button>
-            </div>
-
-            <Card>
-              <CardContent className="p-8">
-                <div className="text-center text-muted-foreground">
-                  <ShoppingBag className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-semibold mb-2">No merchandise yet</h3>
-                  <p className="mb-4">Start selling your branded merchandise to fans</p>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Product
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <MerchandiseManager />
           </TabsContent>
 
           <TabsContent value="earnings" className="space-y-6">

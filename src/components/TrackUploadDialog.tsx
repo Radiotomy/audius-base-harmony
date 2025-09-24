@@ -156,14 +156,28 @@ export const TrackUploadDialog = ({ children, onSuccess }: TrackUploadDialogProp
         }
       }
 
-      // TODO: Save track metadata to database
-      // This will be implemented with the artist uploads hook
-      console.log('Track uploaded successfully:', {
-        ...data,
-        tags: selectedTags,
+      // Save track metadata to database
+      const { useArtistUploads } = await import('@/hooks/useArtistUploads');
+      const { createUpload } = useArtistUploads();
+      
+      const uploadResult = await createUpload({
+        title: data.title,
+        description: data.description,
+        genre: data.genre,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
         audio_file_url: audioResult.path,
         artwork_url: coverArtUrl,
+        license_type: data.license_type,
+        is_explicit: data.is_explicit,
+        copyright_info: data.copyright_info,
+        file_size: audioFile.size,
+        file_format: audioFile.type,
       });
+
+      if (!uploadResult) {
+        setUploadStep('form');
+        return;
+      }
 
       setUploadStep('complete');
       
