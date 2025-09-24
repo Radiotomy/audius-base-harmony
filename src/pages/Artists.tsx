@@ -9,6 +9,8 @@ import Navigation from '@/components/Navigation';
 import ArtistCard from '@/components/ArtistCard';
 import TipArtistDialog from '@/components/TipArtistDialog';
 import { useAudiusTrendingTracks, useAudiusSearch } from '@/hooks/useAudius';
+import { usePlayer } from '@/contexts/PlayerContext';
+import { audiusService } from '@/services/audius';
 import { Link } from 'react-router-dom';
 
 const Artists = () => {
@@ -53,9 +55,38 @@ const Artists = () => {
     }
   };
 
-  const handleTrackPlay = (track: any) => {
-    console.log('Playing track:', track);
-    // This would integrate with the audio player
+  const { play } = usePlayer();
+
+  const handleArtistPlay = async (artist: any) => {
+    try {
+      // Try to get the artist's tracks to find something to play
+      const tracks = await audiusService.getUserTracks(artist.id, 10);
+      if (tracks.length > 0) {
+        const topTrack = tracks[0]; // Use first track as the "top" track
+        const transformedTrack = {
+          id: topTrack.id,
+          title: topTrack.title,
+          artist: topTrack.user.name,
+          duration: `${Math.floor(topTrack.duration / 60)}:${String(topTrack.duration % 60).padStart(2, '0')}`,
+          cover: topTrack.artwork?.['480x480'] || topTrack.artwork?.['150x150'],
+          audiusId: topTrack.id,
+        };
+        
+        // Transform all tracks for the queue
+        const allTracks = tracks.map(t => ({
+          id: t.id,
+          title: t.title,
+          artist: t.user.name,
+          duration: `${Math.floor(t.duration / 60)}:${String(t.duration % 60).padStart(2, '0')}`,
+          cover: t.artwork?.['480x480'] || t.artwork?.['150x150'],
+          audiusId: t.id,
+        }));
+        
+        await play(transformedTrack, allTracks, true);
+      }
+    } catch (error) {
+      console.error('Failed to play artist tracks:', error);
+    }
   };
 
   const handleArtistTip = (artist: any) => {
@@ -202,15 +233,11 @@ const Artists = () => {
                     </Badge>
                     
                     {/* Actions */}
-                    <div className="flex gap-2 justify-center">
+                     <div className="flex gap-2 justify-center">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleTrackPlay({ 
-                          id: artist.id, 
-                          title: artist.topTrack, 
-                          user: { name: artist.name } 
-                        })}
+                        onClick={() => handleArtistPlay(artist)}
                       >
                         <Music className="h-4 w-4 mr-1" />
                         Play

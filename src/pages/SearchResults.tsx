@@ -73,6 +73,36 @@ const SearchResults: React.FC = () => {
     addToQueue(transformedTrack);
   };
 
+  const handleArtistPlay = async (user: any) => {
+    try {
+      const tracks = await audiusService.getUserTracks(user.id, 10);
+      if (tracks.length > 0) {
+        const topTrack = tracks[0];
+        const transformedTrack = {
+          id: topTrack.id,
+          title: topTrack.title,
+          artist: topTrack.user.name,
+          duration: `${Math.floor(topTrack.duration / 60)}:${String(topTrack.duration % 60).padStart(2, '0')}`,
+          cover: topTrack.artwork?.['480x480'] || topTrack.artwork?.['150x150'],
+          audiusId: topTrack.id,
+        };
+        
+        const allTracks = tracks.map(t => ({
+          id: t.id,
+          title: t.title,
+          artist: t.user.name,
+          duration: `${Math.floor(t.duration / 60)}:${String(t.duration % 60).padStart(2, '0')}`,
+          cover: t.artwork?.['480x480'] || t.artwork?.['150x150'],
+          audiusId: t.id,
+        }));
+        
+        await play(transformedTrack, allTracks, true);
+      }
+    } catch (error) {
+      console.error('Failed to play artist tracks:', error);
+    }
+  };
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -248,7 +278,7 @@ const SearchResults: React.FC = () => {
                     <User className="h-5 w-5" />
                     <h2 className="text-xl font-semibold">Artists</h2>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {results.users.slice(0, 6).map((user) => (
                       <ArtistCard
                         key={user.id}
@@ -260,6 +290,7 @@ const SearchResults: React.FC = () => {
                           verified: false,
                           genre: 'Music'
                         }}
+                        onPlay={() => handleArtistPlay(user)}
                       />
                     ))}
                   </div>
@@ -292,6 +323,7 @@ const SearchResults: React.FC = () => {
                       verified: false,
                       genre: 'Music'
                     }}
+                    onPlay={() => handleArtistPlay(user)}
                   />
                 ))}
               </div>
