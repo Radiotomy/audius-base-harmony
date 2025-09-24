@@ -1,23 +1,65 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface ProtectedRouteProps {
   children: ReactNode;
   requireAuth?: boolean;
   requireArtist?: boolean;
+  requireAdmin?: boolean;
 }
 
 const ProtectedRoute = ({ 
   children, 
   requireAuth = true, 
-  requireArtist = false 
+  requireArtist = false,
+  requireAdmin = false 
 }: ProtectedRouteProps) => {
-  const { user, loading, session } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
+  const [roleLoading, setRoleLoading] = useState(false);
+  const [hasRequiredRole, setHasRequiredRole] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    const checkUserRole = async () => {
+      if (!user || (!requireArtist && !requireAdmin)) {
+        setHasRequiredRole(true);
+        return;
+      }
+
+      setRoleLoading(true);
+      try {
+        let requiredRole = '';
+        if (requireAdmin) requiredRole = 'admin';
+        else if (requireArtist) requiredRole = 'artist';
+
+        if (requiredRole) {
+          const { data, error } = await supabase.rpc('has_role', {
+            _user_id: user.id,
+            _role: requiredRole
+          });
+
+          if (error) {
+            console.error('Error checking user role:', error);
+            setHasRequiredRole(false);
+          } else {
+            setHasRequiredRole(data || false);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking user role:', error);
+        setHasRequiredRole(false);
+      } finally {
+        setRoleLoading(false);
+      }
+    };
+
+    checkUserRole();
+  }, [user, requireArtist, requireAdmin]);
+
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -29,10 +71,11 @@ const ProtectedRoute = ({
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Add artist verification check if needed
-  if (requireArtist && user) {
-    // This would check if user has artist role/permissions
-    // For now, we'll allow access but this can be enhanced
+  if ((requireArtist || requireAdmin) && user && !hasRequiredRole) {
+    return <Navigate to="/auth" state={{ 
+      from: location, 
+      error: 'Insufficient permissions' 
+    }} replace />;
   }
 
   return <>{children}</>;

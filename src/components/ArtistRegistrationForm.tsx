@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +14,45 @@ import { useArtistApplication, CreateApplicationData } from '@/hooks/useArtistAp
 import { useAudiusClaim } from '@/hooks/useAudiusClaim';
 import { Music, User, Link, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+// Enhanced input validation schema
+const artistRegistrationSchema = z.object({
+  display_name: z.string()
+    .min(2, 'Display name must be at least 2 characters')
+    .max(50, 'Display name must be less than 50 characters')
+    .regex(/^[a-zA-Z0-9\s\-_\.]+$/, 'Display name contains invalid characters'),
+  bio: z.string()
+    .min(10, 'Bio must be at least 10 characters')
+    .max(500, 'Bio must be less than 500 characters')
+    .refine((val) => {
+      // Basic XSS protection
+      return !/<script|javascript:|on\w+=/i.test(val);
+    }, 'Bio contains invalid characters'),
+  application_type: z.enum(['native', 'audius_claim', 'hybrid']),
+  audius_user_id: z.string().optional(),
+  audius_handle: z.string().optional(),
+});
+
+// Social media URL validation
+const validateSocialUrl = (url: string, platform: string): boolean => {
+  if (!url) return true; // Optional field
+  
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+    
+    const validDomains: { [key: string]: string[] } = {
+      twitter: ['twitter.com', 'x.com'],
+      instagram: ['instagram.com'],
+      youtube: ['youtube.com', 'youtu.be'],
+      soundcloud: ['soundcloud.com'],
+    };
+    
+    return validDomains[platform]?.some(domain => hostname.includes(domain)) || false;
+  } catch {
+    return false;
+  }
+};
 
 const MUSIC_GENRES = [
   'Electronic', 'Hip Hop', 'Rock', 'Pop', 'Jazz', 'Classical', 'R&B', 'Country',
@@ -32,6 +73,7 @@ interface ArtistRegistrationFormProps {
 export const ArtistRegistrationForm = ({ onSuccess }: ArtistRegistrationFormProps) => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
+  const [socialErrors, setSocialErrors] = useState<Record<string, string>>({});
   const [audiusSearchQuery, setAudiusSearchQuery] = useState('');
   const [audiusResults, setAudiusResults] = useState<any[]>([]);
   const [selectedAudiusArtist, setSelectedAudiusArtist] = useState<any>(null);
@@ -40,7 +82,18 @@ export const ArtistRegistrationForm = ({ onSuccess }: ArtistRegistrationFormProp
   const { searchAudiusArtist, createClaim, loading: claimLoading } = useAudiusClaim();
   const { toast } = useToast();
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CreateApplicationData>();
+  const form = useForm<z.infer<typeof artistRegistrationSchema>>({
+    resolver: zodResolver(artistRegistrationSchema),
+    defaultValues: {
+      display_name: '',
+      bio: '',
+      application_type: 'native',
+      audius_user_id: '',
+      audius_handle: '',
+    },
+  });
+
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = form;
   const applicationType = watch('application_type');
 
   const handleGenreToggle = (genre: string) => {
@@ -52,6 +105,20 @@ export const ArtistRegistrationForm = ({ onSuccess }: ArtistRegistrationFormProp
   };
 
   const handleSocialLinkChange = (platform: string, url: string) => {
+    // Validate URL if provided
+    if (url && !validateSocialUrl(url, platform)) {
+      setSocialErrors(prev => ({
+        ...prev,
+        [platform]: `Invalid ${platform} URL`
+      }));
+    } else {
+      setSocialErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[platform];
+        return newErrors;
+      });
+    }
+
     setSocialLinks(prev => ({
       ...prev,
       [platform]: url
@@ -72,13 +139,34 @@ export const ArtistRegistrationForm = ({ onSuccess }: ArtistRegistrationFormProp
     setValue('display_name', artist.name);
   };
 
-  const onSubmit = async (data: CreateApplicationData) => {
+  const onSubmit = async (data: z.infer<typeof artistRegistrationSchema>) => {
+    // Validate genres selection
+    if (selectedGenres.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please select at least one genre",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check for social media validation errors
+    const hasErrors = Object.keys(socialErrors).length > 0;
+    if (hasErrors) {
+      toast({
+        title: "Validation Error", 
+        description: "Please fix social media URL errors",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const applicationData = {
         ...data,
         genres: selectedGenres,
         social_links: socialLinks,
-      };
+      } as CreateApplicationData;
 
       await createApplication(applicationData);
 
@@ -204,7 +292,7 @@ export const ArtistRegistrationForm = ({ onSuccess }: ArtistRegistrationFormProp
               <Label htmlFor="display_name">Artist Display Name</Label>
               <Input
                 id="display_name"
-                {...register('display_name', { required: 'Display name is required' })}
+                {...register('display_name')}
                 placeholder="Your artist name"
               />
               {errors.display_name && (
@@ -236,7 +324,7 @@ export const ArtistRegistrationForm = ({ onSuccess }: ArtistRegistrationFormProp
             <Label htmlFor="bio">Artist Bio</Label>
             <Textarea
               id="bio"
-              {...register('bio', { required: 'Bio is required' })}
+              {...register('bio')}
               placeholder="Tell us about your music and artistic journey..."
               rows={4}
             />
@@ -257,6 +345,9 @@ export const ArtistRegistrationForm = ({ onSuccess }: ArtistRegistrationFormProp
                     value={socialLinks[platform] || ''}
                     onChange={(e) => handleSocialLinkChange(platform, e.target.value)}
                   />
+                  {socialErrors[platform] && (
+                    <p className="text-sm text-destructive mt-1">{socialErrors[platform]}</p>
+                  )}
                 </div>
               ))}
             </div>

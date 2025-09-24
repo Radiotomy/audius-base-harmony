@@ -34,6 +34,33 @@ async function deployContract(
   };
 }
 
+// Input validation schema
+const deployContractsSchema = {
+  contracts: (value: any) => Array.isArray(value) && value.length > 0 && value.every((c: any) => typeof c === 'string'),
+  deployerAddress: (value: any) => typeof value === 'string' && /^0x[a-fA-F0-9]{40}$/.test(value),
+};
+
+function validateInput(data: any): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  
+  if (!deployContractsSchema.contracts(data.contracts)) {
+    errors.push('Invalid contracts array');
+  }
+  
+  if (!deployContractsSchema.deployerAddress(data.deployerAddress)) {
+    errors.push('Invalid deployer address format');
+  }
+  
+  // Validate contract names
+  const allowedContracts = ['ArtistTipping', 'MusicNFTFactory', 'EventTicketing'];
+  const invalidContracts = data.contracts?.filter((c: string) => !allowedContracts.includes(c));
+  if (invalidContracts?.length > 0) {
+    errors.push(`Invalid contract names: ${invalidContracts.join(', ')}`);
+  }
+  
+  return { isValid: errors.length === 0, errors };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -42,7 +69,21 @@ serve(async (req) => {
 
   try {
     const supabase = createSupabaseClient();
-    const { contracts, deployerAddress } = await req.json();
+    const requestData = await req.json();
+    
+    // Validate input
+    const validation = validateInput(requestData);
+    if (!validation.isValid) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Invalid input: ' + validation.errors.join(', ')
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    const { contracts, deployerAddress } = requestData;
 
     console.log('Deploying contracts for address:', deployerAddress);
     console.log('Contracts to deploy:', contracts);
