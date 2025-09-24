@@ -10,6 +10,16 @@ interface UserProfile {
   avatar_url?: string;
   audius_handle?: string;
   audius_user_id?: string;
+  artist_verified?: boolean;
+  artist_registration_type?: string;
+  audius_verified?: boolean;
+  genres?: string[];
+  social_links?: any;
+  artist_bio?: string;
+  artist_location?: string;
+  website_url?: string;
+  verified_at?: string;
+  verification_status?: string;
   created_at: string;
   updated_at: string;
 }

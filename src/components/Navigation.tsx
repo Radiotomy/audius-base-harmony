@@ -70,6 +70,11 @@ const Navigation: React.FC = () => {
                 Artists
               </Button>
             </Link>
+            <Link to="/artist-registration">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Become an Artist
+              </Button>
+            </Link>
             {user && (
               <Link to="/dashboard">
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
