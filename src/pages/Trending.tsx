@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Play, ArrowLeft, Plus, Clock, TrendingUp } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import AudioPlayer from '@/components/AudioPlayer';
+import EnhancedAudioPlayer from '@/components/EnhancedAudioPlayer';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
@@ -212,8 +212,10 @@ const Trending = () => {
 
       {/* Audio Player */}
       {showPlayer && player.currentTrack && (
-        <AudioPlayer
+        <EnhancedAudioPlayer
+          isCompact={true}
           showEqualizer={true}
+          showQueue={true}
         />
       )}
     </div>

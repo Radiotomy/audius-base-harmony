@@ -3,7 +3,7 @@ import { Play, Heart, Users, TrendingUp, Zap, Plus } from 'lucide-react';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import TrackCard from '@/components/TrackCard';
 import ArtistCard from '@/components/ArtistCard';
-import AudioPlayer from '@/components/AudioPlayer';
+import EnhancedAudioPlayer from '@/components/EnhancedAudioPlayer';
 import { useAuth } from '@/hooks/useAuth';
 import { usePlayer } from '@/contexts/PlayerContext';
 import FavoriteButton from '@/components/FavoriteButton';
@@ -359,8 +359,10 @@ const Index = () => {
 
         {/* Audio Player */}
         {showPlayer && player.currentTrack && (
-          <AudioPlayer
+          <EnhancedAudioPlayer
+            isCompact={true}
             showEqualizer={true}
+            showQueue={true}
           />
         )}
     </div>

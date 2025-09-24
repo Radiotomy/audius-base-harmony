@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Heart, MoreHorizontal } from 'lucide-react';
+import { Play, Heart, MoreHorizontal, Zap, MessageCircle, Star } from 'lucide-react';
 import FavoriteButton from './FavoriteButton';
 import AddToPlaylistDialog from './AddToPlaylistDialog';
+import TipArtistDialog from './TipArtistDialog';
+import RatingStars from './RatingStars';
+import CommentSection from './CommentSection';
 import { useAuth } from '@/hooks/useAuth';
 import { usePlayer } from '@/contexts/PlayerContext';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 interface TrackCardProps {
   track: {
@@ -23,6 +32,8 @@ interface TrackCardProps {
 const TrackCard: React.FC<TrackCardProps> = ({ track, onPlay, className }) => {
   const { user } = useAuth();
   const player = usePlayer();
+  const [showTipDialog, setShowTipDialog] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   
   const formatPlayCount = (count?: number) => {
     if (!count) return '0';
@@ -94,19 +105,55 @@ const TrackCard: React.FC<TrackCardProps> = ({ track, onPlay, className }) => {
           </div>
         </div>
 
+        {/* Rating */}
+        <div className="mb-3">
+          <RatingStars
+            rating={0}
+            onRate={(rating) => console.log('Rating:', rating)}
+            size="sm"
+            showCount={true}
+            count={0}
+          />
+        </div>
+
         {/* Actions */}
         {user && (
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <FavoriteButton
                 trackId={track.id}
                 size="sm"
               />
-              <AddToPlaylistDialog trackId={track.id}>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </AddToPlaylistDialog>
+              <Button
+                onClick={() => setShowComments(!showComments)}
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={() => setShowTipDialog(true)}
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-primary"
+              >
+                <Zap className="h-4 w-4" />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <AddToPlaylistDialog trackId={track.id}>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      Add to Playlist
+                    </DropdownMenuItem>
+                  </AddToPlaylistDialog>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             
             <Button
@@ -120,6 +167,26 @@ const TrackCard: React.FC<TrackCardProps> = ({ track, onPlay, className }) => {
             </Button>
           </div>
         )}
+
+        {/* Comments Section */}
+        {showComments && user && (
+          <div className="mt-4 pt-4 border-t">
+            <CommentSection
+              targetId={track.id}
+              targetType="track"
+            />
+          </div>
+        )}
+
+        {/* Tip Dialog */}
+        <TipArtistDialog
+          open={showTipDialog}
+          onOpenChange={setShowTipDialog}
+          artist={{
+            id: track.user?.name || 'unknown',
+            name: track.user?.name || 'Unknown Artist',
+          }}
+        />
       </CardContent>
     </Card>
   );
