@@ -170,6 +170,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
               <RealTimeVisualizer 
                 isPlaying={isPlaying} 
                 className="h-6" 
+                analyser={webAudio.analyser}
                 analyserData={webAudio.analyserData}
                 type="bars"
               />
@@ -288,6 +289,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
         <div className="flex justify-center">
           <RealTimeVisualizer 
             isPlaying={isPlaying} 
+            analyser={webAudio.analyser}
             analyserData={webAudio.analyserData}
             type="spectrum"
             className="w-full max-w-md"

@@ -187,5 +187,6 @@ export const useWebAudio = (audioElement: HTMLAudioElement | null) => {
     setEQGain,
     resetEQ,
     audioContext: audioContextRef.current,
+    analyser: analyserRef.current,
   };
 };

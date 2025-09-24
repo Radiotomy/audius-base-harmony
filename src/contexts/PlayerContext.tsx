@@ -48,11 +48,12 @@ interface PlayerContextType extends PlayerState {
   clearQueue: () => void;
   webAudio: {
     isInitialized: boolean;
-    analyserData: Uint8Array;
+    analyserData: Uint8Array | null;
     eqBands: Array<{ frequency: number; gain: number; Q: number }>;
     setEQGain: (bandIndex: number, gain: number) => void;
     resetEQ: () => void;
     audioContext: AudioContext | null;
+    analyser: AnalyserNode | null;
   };
   audioElement: HTMLAudioElement | null;
 }
