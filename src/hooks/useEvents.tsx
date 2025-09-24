@@ -73,7 +73,7 @@ export const useEvents = () => {
         .from('events')
         .select(`
           *,
-          venues (
+          venues!fk_events_venue (
             id,
             name,
             city

@@ -56,7 +56,7 @@ export const useTickets = () => {
             title,
             event_date,
             venue_id,
-            venues (
+            venues!fk_events_venue (
               name,
               address
             )
