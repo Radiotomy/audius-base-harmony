@@ -8,7 +8,6 @@ import {
   User, Music, Heart, Users, TrendingUp, Play, 
   Clock, Headphones, Plus, Settings, BarChart3 
 } from 'lucide-react';
-import Navigation from '@/components/Navigation';
 import AdvancedPlaylistManager from '@/components/AdvancedPlaylistManager';
 import AnalyticsInsights from '@/components/AnalyticsInsights';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,7 +27,6 @@ const Dashboard: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8">
           <Card className="max-w-md mx-auto p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
@@ -47,7 +45,6 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mx-auto mb-2" />
           <p className="text-center text-muted-foreground">Loading dashboard...</p>
@@ -58,8 +55,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Header */}
         <div className="mb-8">

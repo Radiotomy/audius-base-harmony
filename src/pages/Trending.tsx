@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Play, ArrowLeft, Plus, Clock, TrendingUp } from 'lucide-react';
-import Navigation from '@/components/Navigation';
 import EnhancedAudioPlayer from '@/components/EnhancedAudioPlayer';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToPlaylistDialog from '@/components/AddToPlaylistDialog';
@@ -65,8 +64,6 @@ const Trending = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       {/* Hero Section */}
       <section className="py-16 border-b border-border">
         <div className="container mx-auto px-4">

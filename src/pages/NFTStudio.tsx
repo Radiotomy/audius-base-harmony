@@ -1,4 +1,3 @@
-import Navigation from "@/components/Navigation";
 import { NFTCollectionManager } from "@/components/NFTCollectionManager";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,8 +21,6 @@ export default function NFTStudio() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
-      <Navigation />
-      
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">

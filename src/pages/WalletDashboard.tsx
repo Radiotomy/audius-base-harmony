@@ -1,5 +1,4 @@
 import React from 'react';
-import Navigation from '@/components/Navigation';
 import { TransactionHistory } from '@/components/TransactionHistory';
 import { WalletBalances } from '@/components/WalletBalances';
 import { SwapWidget } from '@/components/SwapWidget';
@@ -35,8 +34,6 @@ const WalletDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">

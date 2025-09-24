@@ -1,5 +1,4 @@
 // NFT Marketplace - Discover and collect unique music NFTs
-import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,8 +35,6 @@ export default function NFTMarketplace() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
-      <Navigation />
-      
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">

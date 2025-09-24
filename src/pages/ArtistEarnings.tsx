@@ -20,7 +20,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Navigation from '@/components/Navigation';
 
 interface TipRecord {
   id: string;
@@ -136,8 +135,6 @@ export const ArtistEarnings: React.FC = () => {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-background">
-        <Navigation />
-        
         <main className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold tracking-tight">Artist Earnings</h1>

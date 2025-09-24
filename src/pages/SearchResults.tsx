@@ -12,7 +12,6 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { audiusService } from '@/services/audius';
 import TrackCard from '@/components/TrackCard';
 import ArtistCard from '@/components/ArtistCard';
-import Navigation from '@/components/Navigation';
 
 const SearchResults: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -112,7 +111,6 @@ const SearchResults: React.FC = () => {
   if (!query) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Search AudioBASE</h1>
@@ -145,8 +143,6 @@ const SearchResults: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
