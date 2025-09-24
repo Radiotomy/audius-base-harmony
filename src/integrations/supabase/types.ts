@@ -1388,45 +1388,6 @@ export type Database = {
           },
         ]
       }
-      public_tip_stats: {
-        Row: {
-          amount: number | null
-          artist_id: string | null
-          artist_name: string | null
-          created_at: string | null
-          currency: string | null
-          masked_artist_wallet_address: string | null
-          masked_wallet_address: string | null
-          message: string | null
-          network: string | null
-          status: string | null
-        }
-        Insert: {
-          amount?: number | null
-          artist_id?: string | null
-          artist_name?: string | null
-          created_at?: string | null
-          currency?: string | null
-          masked_artist_wallet_address?: never
-          masked_wallet_address?: never
-          message?: string | null
-          network?: string | null
-          status?: string | null
-        }
-        Update: {
-          amount?: number | null
-          artist_id?: string | null
-          artist_name?: string | null
-          created_at?: string | null
-          currency?: string | null
-          masked_artist_wallet_address?: never
-          masked_wallet_address?: never
-          message?: string | null
-          network?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
       public_venues: {
         Row: {
           address: string | null
@@ -1480,6 +1441,21 @@ export type Database = {
       }
     }
     Functions: {
+      get_public_tip_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          amount: number
+          artist_id: string
+          artist_name: string
+          created_at: string
+          currency: string
+          masked_artist_wallet_address: string
+          masked_wallet_address: string
+          message: string
+          network: string
+          status: string
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: string
