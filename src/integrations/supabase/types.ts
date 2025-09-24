@@ -705,6 +705,13 @@ export type Database = {
             foreignKeyName: "fk_events_venue"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "public_venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_events_venue"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
@@ -1301,10 +1308,111 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_event_streams: {
+        Row: {
+          chat_enabled: boolean | null
+          ended_at: string | null
+          event_id: string | null
+          id: string | null
+          is_live: boolean | null
+          recording_url: string | null
+          started_at: string | null
+          stream_url: string | null
+          viewer_count: number | null
+        }
+        Insert: {
+          chat_enabled?: boolean | null
+          ended_at?: string | null
+          event_id?: string | null
+          id?: string | null
+          is_live?: boolean | null
+          recording_url?: string | null
+          started_at?: string | null
+          stream_url?: string | null
+          viewer_count?: number | null
+        }
+        Update: {
+          chat_enabled?: boolean | null
+          ended_at?: string | null
+          event_id?: string | null
+          id?: string | null
+          is_live?: boolean | null
+          recording_url?: string | null
+          started_at?: string | null
+          stream_url?: string | null
+          viewer_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_streams_event"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_venues: {
+        Row: {
+          address: string | null
+          capacity: number | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: string
+      }
+      has_role: {
+        Args: { _role: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "fan" | "artist" | "admin"
