@@ -16,6 +16,7 @@ export const OnchainProvider = ({ children }: OnchainProviderProps) => {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <BaseOnchainProvider 
+          apiKey="omEd03jYZJ62ZWOvOIW9PBwKL5tBiq2c"
           chain={base}
         >
           {children}
