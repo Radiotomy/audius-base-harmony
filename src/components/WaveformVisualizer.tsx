@@ -32,16 +32,27 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
   };
 
   const renderVisualization = () => {
-    const baseClasses = "transition-all duration-150 bg-primary/60";
+    const baseClasses = "transition-all duration-150";
     
-    // Use real frequency data if available, otherwise fallback to animated bars
+    // Always use real frequency data when available, no fallback animations
     const getBarHeight = (index: number, totalBars: number) => {
       if (analyserData && isPlaying) {
         const dataIndex = Math.floor((index / totalBars) * analyserData.length);
         const value = analyserData[dataIndex] || 0;
         return Math.max(4, (value / 255) * 24 + 4);
       }
-      return Math.random() * 24 + 4;
+      // Silent state - show minimal bars
+      return 4;
+    };
+
+    const getBarColor = (index: number, totalBars: number) => {
+      if (analyserData && isPlaying) {
+        const dataIndex = Math.floor((index / totalBars) * analyserData.length);
+        const value = analyserData[dataIndex] || 0;
+        const intensity = value / 255;
+        return `hsl(var(--base-blue) / ${0.3 + intensity * 0.7})`;
+      }
+      return 'hsl(var(--primary) / 0.3)';
     };
     
     switch (visualizationType) {
@@ -49,13 +60,11 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
         return Array.from({ length: 40 }, (_, i) => (
           <div
             key={i}
-            className={`${baseClasses} rounded-full ${
-              !analyserData && isPlaying ? 'animate-waveform-dance' : ''
-            }`}
+            className={`${baseClasses} rounded-full`}
             style={{
               width: '2px',
               height: `${getBarHeight(i, 40)}px`,
-              animationDelay: !analyserData ? `${Math.random() * 0.8}s` : undefined,
+              backgroundColor: getBarColor(i, 40),
             }}
           />
         ));
@@ -68,19 +77,16 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
             const value = analyserData[dataIndex] || 0;
             height = Math.max(4, (value / 255) * 28 + 4);
           } else {
-            const centerDistance = Math.abs(i - 10);
-            height = Math.max(4, 28 - centerDistance * 2);
+            height = 4;
           }
           return (
             <div
               key={i}
-              className={`${baseClasses} rounded-full ${
-                !analyserData && isPlaying ? 'animate-frequency-spectrum' : ''
-              }`}
+              className={`${baseClasses} rounded-full`}
               style={{
                 width: '3px',
                 height: `${height}px`,
-                animationDelay: !analyserData ? `${i * 0.05}s` : undefined,
+                backgroundColor: getBarColor(i, 20),
               }}
             />
           );
@@ -94,17 +100,17 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
             const value = analyserData[dataIndex] || 0;
             const scale = 0.8 + (value / 255) * 0.4;
             size = size * scale;
+          } else {
+            size = 8 + i * 2; // Smaller static circles when not playing
           }
           return (
             <div
               key={i}
-              className={`${baseClasses} rounded-full ${
-                !analyserData && isPlaying ? 'animate-circular-pulse' : ''
-              }`}
+              className={`${baseClasses} rounded-full`}
               style={{
                 width: `${size}px`,
                 height: `${size}px`,
-                animationDelay: !analyserData ? `${i * 0.2}s` : undefined,
+                backgroundColor: getBarColor(i, 5),
               }}
             />
           );
@@ -112,22 +118,22 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
         
       case 'wave':
         return Array.from({ length: 30 }, (_, i) => {
-          let height = 16;
+          let height;
           if (analyserData && isPlaying) {
             const dataIndex = Math.floor((i / 30) * analyserData.length);
             const value = analyserData[dataIndex] || 0;
             height = Math.max(4, (value / 255) * 20 + 4);
+          } else {
+            height = 4;
           }
           return (
             <div
               key={i}
-              className={`${baseClasses} rounded-full ${
-                !analyserData && isPlaying ? 'animate-line-wave' : ''
-              }`}
+              className={`${baseClasses} rounded-full`}
               style={{
                 width: '2px',
                 height: `${height}px`,
-                animationDelay: !analyserData ? `${i * 0.03}s` : undefined,
+                backgroundColor: getBarColor(i, 30),
               }}
             />
           );
@@ -135,23 +141,27 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
         
       case 'dots':
         return Array.from({ length: 25 }, (_, i) => {
-          let opacity = 0.6;
+          let opacity;
+          let backgroundColor;
           if (analyserData && isPlaying) {
             const dataIndex = Math.floor((i / 25) * analyserData.length);
             const value = analyserData[dataIndex] || 0;
             opacity = 0.3 + (value / 255) * 0.7;
+            const intensity = value / 255;
+            backgroundColor = `hsl(var(--base-blue) / ${intensity})`;
+          } else {
+            opacity = 0.3;
+            backgroundColor = 'hsl(var(--primary) / 0.3)';
           }
           return (
             <div
               key={i}
-              className={`${baseClasses} rounded-full ${
-                !analyserData && isPlaying ? 'animate-beat-dots' : ''
-              }`}
+              className={`${baseClasses} rounded-full`}
               style={{
                 width: '4px',
                 height: '4px',
-                opacity: analyserData && isPlaying ? opacity : undefined,
-                animationDelay: !analyserData ? `${Math.random() * 0.6}s` : undefined,
+                opacity,
+                backgroundColor,
               }}
             />
           );

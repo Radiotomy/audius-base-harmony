@@ -2,8 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-// Force refresh by updating import
-import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Share, List, MoreHorizontal } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Share, List, MoreHorizontal, Minimize2 } from 'lucide-react';
 import { usePlayer, type Track } from '@/contexts/PlayerContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -186,6 +185,19 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   return (
     <Card className="p-6 shadow-card bg-card/95 backdrop-blur-md border-border">
       <div className="space-y-6">
+        {/* Minimize Button */}
+        <div className="flex justify-end">
+          <Button
+            onClick={() => setExpanded(false)}
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            title="Minimize player"
+          >
+            <Minimize2 className="h-4 w-4" />
+          </Button>
+        </div>
+
         {/* Track Info */}
         <div className="text-center">
           <h3 className="text-xl font-bold">{currentTrack.title}</h3>
