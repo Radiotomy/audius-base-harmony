@@ -12,6 +12,8 @@ import Auth from "./pages/Auth";
 import Trending from "./pages/Trending";
 import Artists from "./pages/Artists";
 import SearchResults from "./pages/SearchResults";
+import Dashboard from "./pages/Dashboard";
+import DashboardProfile from "./pages/DashboardProfile";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -27,9 +29,11 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/trending" element={<Trending />} />
-                  <Route path="/artists" element={<Artists />} />
-                  <Route path="/search" element={<SearchResults />} />
+                <Route path="/trending" element={<Trending />} />
+                <Route path="/artists" element={<Artists />} />
+                <Route path="/search" element={<SearchResults />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard/profile" element={<DashboardProfile />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

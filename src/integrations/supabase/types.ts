@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_feed: {
+        Row: {
+          activity_data: Json
+          activity_type: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          activity_data: Json
+          activity_type: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          activity_data?: Json
+          activity_type?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       artist_tips: {
         Row: {
           amount: number
@@ -101,6 +125,82 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parent_id: string | null
+          target_id: string
+          target_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          target_id: string
+          target_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          target_id?: string
+          target_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlist_collaborators: {
+        Row: {
+          added_by: string
+          created_at: string
+          id: string
+          permission_level: string
+          playlist_id: string
+          user_id: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          id?: string
+          permission_level?: string
+          playlist_id: string
+          user_id: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          id?: string
+          permission_level?: string
+          playlist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_collaborators_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "user_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playlist_tracks: {
         Row: {
           added_at: string | null
@@ -173,6 +273,33 @@ export type Database = {
         }
         Relationships: []
       }
+      track_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string | null
@@ -202,29 +329,86 @@ export type Database = {
           },
         ]
       }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      user_listening_stats: {
+        Row: {
+          created_at: string
+          id: string
+          last_played_at: string
+          play_count: number
+          total_listen_time: number
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_played_at?: string
+          play_count?: number
+          total_listen_time?: number
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_played_at?: string
+          play_count?: number
+          total_listen_time?: number
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_playlists: {
         Row: {
+          cover_image_url: string | null
           created_at: string | null
           description: string | null
           id: string
+          is_collaborative: boolean | null
           is_public: boolean | null
           name: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
+          is_collaborative?: boolean | null
           is_public?: boolean | null
           name: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
+          is_collaborative?: boolean | null
           is_public?: boolean | null
           name?: string
           updated_at?: string | null
