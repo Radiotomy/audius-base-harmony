@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import SearchBar from '@/components/SearchBar';
 import { WalletConnectionDialog } from '@/components/WalletConnectionDialog';
+import MobileWalletConnection from '@/components/MobileWalletConnection';
 import MobileNavigation from '@/components/MobileNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -142,7 +143,9 @@ const Navigation: React.FC = () => {
           
           {user ? (
             <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
-              {!isMobile && (
+              {isMobile ? (
+                <MobileWalletConnection />
+              ) : (
                 <WalletConnectionDialog>
                   <Button 
                     variant="outline"

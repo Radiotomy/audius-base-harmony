@@ -36,11 +36,11 @@ const MobileNavigation = () => {
   return (
     <div className="lg:hidden">
       <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="sm" className="p-2">
-            <Menu className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="sm" className="p-2 touch-target tap-highlight-none">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
         <SheetContent side="left" className="w-80 p-0">
           <div className="flex flex-col h-full bg-background">
             {/* Header */}
@@ -75,14 +75,14 @@ const MobileNavigation = () => {
             </div>
 
             {/* Navigation Links */}
-            <nav className="flex-1 overflow-y-auto">
+            <nav className="flex-1 overflow-y-auto scroll-smooth" data-scroll-optimized>
               <div className="p-4 space-y-2">
                 {navLinks.map((link) => (
                   <SheetClose asChild key={link.to}>
                     <Link
                       to={link.to}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors touch-target tap-highlight-none",
                         "hover:bg-accent hover:text-accent-foreground",
                         "focus:bg-accent focus:text-accent-foreground focus:outline-none"
                       )}
@@ -117,7 +117,7 @@ const MobileNavigation = () => {
                   </div>
                   <div className="flex gap-2">
                     <SheetClose asChild>
-                      <Button asChild variant="outline" size="sm" className="flex-1">
+                      <Button asChild variant="outline" size="sm" className="flex-1 touch-target">
                         <Link to="/dashboard">Dashboard</Link>
                       </Button>
                     </SheetClose>
@@ -125,7 +125,7 @@ const MobileNavigation = () => {
                       variant="ghost" 
                       size="sm" 
                       onClick={signOut}
-                      className="flex-1"
+                      className="flex-1 touch-target"
                     >
                       Sign Out
                     </Button>
@@ -133,7 +133,7 @@ const MobileNavigation = () => {
                 </div>
               ) : (
                 <SheetClose asChild>
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full touch-target">
                     <Link to="/auth">Sign In</Link>
                   </Button>
                 </SheetClose>

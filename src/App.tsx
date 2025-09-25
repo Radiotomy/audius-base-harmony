@@ -10,6 +10,8 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Navigation from "@/components/Navigation";
 import MobileAudioPlayer from "@/components/MobileAudioPlayer";
+import MobileTouchOptimizations from "@/components/MobileTouchOptimizations";
+import { usePerformanceOptimizations } from "@/hooks/usePerformanceOptimizations";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Trending from "./pages/Trending";
@@ -30,7 +32,11 @@ import ArtistDashboard from "./pages/ArtistDashboard";
 import { MusicManagement } from "./pages/MusicManagement";
 import NotFound from "./pages/NotFound";
 
-const App = () => (
+const App = () => {
+  // Initialize performance optimizations
+  usePerformanceOptimizations();
+  
+  return (
   <ErrorBoundary>
     <AuthProvider>
       <OnchainProvider>
@@ -40,9 +46,12 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                <div className="min-h-screen bg-background">
-                  <Navigation />
-                  <main className="pb-20 lg:pb-8">
+                <MobileTouchOptimizations>
+                  <div className="min-h-screen bg-background">
+                    <Navigation />
+                    <main className="pb-20 lg:pb-8"
+                      data-scroll-optimized
+                    >
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route path="/auth" element={<Auth />} />
@@ -109,8 +118,9 @@ const App = () => (
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>
-                  <MobileAudioPlayer />
-                </div>
+                    <MobileAudioPlayer />
+                  </div>
+                </MobileTouchOptimizations>
               </BrowserRouter>
             </TooltipProvider>
           </PlayerProvider>
@@ -118,6 +128,7 @@ const App = () => (
       </OnchainProvider>
     </AuthProvider>
   </ErrorBoundary>
-);
+  );
+};
 
 export default App;

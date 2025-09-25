@@ -5,6 +5,8 @@ import { useRadioStation } from '@/hooks/useRadioStation';
 import TrackCard from '@/components/TrackCard';
 import ArtistCard from '@/components/ArtistCard';
 import EnhancedAudioPlayer from '@/components/EnhancedAudioPlayer';
+import MobileOptimizedAudioPlayer from '@/components/MobileOptimizedAudioPlayer';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/hooks/useAuth';
 import { usePlayer } from '@/contexts/PlayerContext';
 import FavoriteButton from '@/components/FavoriteButton';
@@ -20,6 +22,7 @@ const Index = () => {
   const [isRadioMode, setIsRadioMode] = React.useState(false);
   const { user } = useAuth();
   const player = usePlayer();
+  const isMobile = useIsMobile();
   const { tracks: trendingTracks, loading, error } = useAudiusTrendingTracks(6);
   const { createRadioQueue, isLoading: radioLoading } = useRadioStation();
 
@@ -385,11 +388,15 @@ const Index = () => {
 
         {/* Audio Player */}
         {showPlayer && player.currentTrack && (
-          <EnhancedAudioPlayer
-            isCompact={true}
-            showEqualizer={true}
-            showQueue={true}
-          />
+          isMobile ? (
+            <MobileOptimizedAudioPlayer />
+          ) : (
+            <EnhancedAudioPlayer
+              isCompact={true}
+              showEqualizer={true}
+              showQueue={true}
+            />
+          )
         )}
     </div>
   );

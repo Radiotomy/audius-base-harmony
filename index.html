@@ -2,10 +2,28 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Mobile-first viewport with performance optimizations -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="AudioBASE" />
+    <meta name="theme-color" content="#0066ff" />
+    <meta name="msapplication-TileColor" content="#0066ff" />
+    
+    <!-- Performance optimizations -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="HandheldFriendly" content="true" />
+    
+    <!-- Audio-related optimizations -->
+    <meta name="apple-mobile-web-app-capable-sites" content="*" />
+    
     <title>AudioBASE - Stream Audius Music on Base</title>
     <meta name="description" content="AudioBASE bridges Audius streaming with Base blockchain monetization. Tip artists, mint NFTs, and unlock Web3 music experiences." />
     <meta name="author" content="AudioBASE" />
+    <meta name="keywords" content="Audius, Base, blockchain, music, streaming, NFT, crypto, tips, Web3" />
 
     <meta property="og:title" content="AudioBASE - Stream Audius Music on Base" />
     <meta property="og:description" content="AudioBASE bridges Audius streaming with Base blockchain monetization. Tip artists, mint NFTs, and unlock Web3 music experiences." />
@@ -15,6 +33,10 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/src/main.tsx" as="script" type="module" />
+    <link rel="prefetch" href="/src/assets/audiobase-logo.png" />
   </head>
 
   <body>
