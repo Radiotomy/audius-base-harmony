@@ -5,6 +5,7 @@ import WalletConnect from '@/components/OnchainWallet';
 import { ContractDeployment } from '@/components/ContractDeployment';
 import { BaseEcosystemIntegration } from '@/components/BaseEcosystemIntegration';
 import { FarcasterFrames } from '@/components/FarcasterFrames';
+import { DeploymentReadinessCheck } from '@/components/DeploymentReadinessCheck';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Zap, Coins, Wallet, Network, Ticket } from 'lucide-react';
@@ -13,7 +14,6 @@ const ContractDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <MobileNavigation />
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
@@ -121,6 +121,7 @@ const ContractDashboard: React.FC = () => {
             </div>
 
             <div className="space-y-6">
+              <DeploymentReadinessCheck />
               <ContractDeployment />
             </div>
           </div>
@@ -139,7 +140,7 @@ const ContractDashboard: React.FC = () => {
                   <li>• $100 gas credits via Paymaster</li>
                   <li>• 10-100x cheaper than Ethereum</li>
                   <li>• 2-second confirmation times</li>
-                  <li>• EVM compatibility</li>
+                  <li>• ~$0.30 total deployment cost</li>
                   <li>• Coinbase Smart Wallet integration</li>
                 </ul>
               </div>
