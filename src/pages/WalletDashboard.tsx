@@ -2,6 +2,7 @@ import React from 'react';
 import { TransactionHistory } from '@/components/TransactionHistory';
 import { WalletBalances } from '@/components/WalletBalances';
 import { SwapWidget } from '@/components/SwapWidget';
+import { OnchainFundButton } from '@/components/OnchainFundButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Wallet, TrendingUp, Zap, ArrowUpRight } from 'lucide-react';
@@ -63,10 +64,11 @@ const WalletDashboard: React.FC = () => {
         ) : (
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Left Column - Balances and Swap */}
-            <div className="space-y-6">
-              <WalletBalances />
-              <SwapWidget />
-            </div>
+              <div className="space-y-6">
+                <WalletBalances />
+                <OnchainFundButton />
+                <SwapWidget />
+              </div>
 
             {/* Right Column - Transaction History */}
             <div className="lg:col-span-2">

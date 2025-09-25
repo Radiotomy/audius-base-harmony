@@ -7,7 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNFTCollections, useNFTTokens } from '@/hooks/useNFT';
 import { useAccount } from 'wagmi';
-import { Loader2, Plus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Plus } from 'lucide-react';
+import { OnchainTransaction, createMintCalls } from './OnchainTransaction';
+import { parseEther } from 'viem';
 
 interface NFTMintDialogProps {
   trackId?: string;
@@ -17,7 +20,6 @@ interface NFTMintDialogProps {
 
 export const NFTMintDialog = ({ trackId, trackTitle, trackArtist }: NFTMintDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     collection_id: '',
     name: trackTitle || '',
@@ -30,12 +32,21 @@ export const NFTMintDialog = ({ trackId, trackTitle, trackArtist }: NFTMintDialo
   const { collections } = useNFTCollections();
   const { mintToken } = useNFTTokens();
   const { address } = useAccount();
+  const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!address) return;
+  const resetForm = () => {
+    setFormData({
+      collection_id: '',
+      name: trackTitle || '',
+      description: '',
+      image_url: '',
+      price: '',
+      royalty_percentage: '5',
+    });
+  };
 
-    setLoading(true);
+  const onMintSuccess = async (response: any) => {
+    // Save to database after successful on-chain minting
     try {
       await mintToken({
         collection_id: formData.collection_id,
@@ -44,28 +55,49 @@ export const NFTMintDialog = ({ trackId, trackTitle, trackArtist }: NFTMintDialo
         name: formData.name,
         description: formData.description,
         image_url: formData.image_url,
-        owner_address: address,
-        creator_address: address,
+        owner_address: address!,
+        creator_address: address!,
         price: formData.price ? parseFloat(formData.price) : undefined,
         is_for_sale: !!formData.price,
         royalty_percentage: parseFloat(formData.royalty_percentage),
       });
       
       setOpen(false);
-      setFormData({
-        collection_id: '',
-        name: trackTitle || '',
-        description: '',
-        image_url: '',
-        price: '',
-        royalty_percentage: '5',
+      resetForm();
+      
+      toast({
+        title: "NFT Minted Successfully! 🎉",
+        description: `${formData.name} has been minted to the blockchain`,
       });
     } catch (error) {
-      console.error('Minting error:', error);
-    } finally {
-      setLoading(false);
+      console.error('Database save error:', error);
+      toast({
+        title: "Minted but database error",
+        description: "NFT was minted but failed to save to database",
+        variant: "destructive",
+      });
     }
   };
+
+  const onMintError = (error: Error) => {
+    toast({
+      title: "Minting Failed",
+      description: error.message || "Failed to mint NFT",
+      variant: "destructive",
+    });
+  };
+
+  // Get selected collection for contract address
+  const selectedCollection = collections.find(c => c.id === formData.collection_id);
+  const mintCall = selectedCollection?.contract_address && address ? 
+    createMintCalls(
+      selectedCollection.contract_address as `0x${string}`,
+      address,
+      `${Date.now()}`,
+      formData.price
+    ) : null;
+
+  const canMint = address && formData.collection_id && formData.name;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -79,7 +111,7 @@ export const NFTMintDialog = ({ trackId, trackTitle, trackArtist }: NFTMintDialo
         <DialogHeader>
           <DialogTitle>Mint Music NFT</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="collection">Collection</Label>
             <Select
@@ -156,21 +188,28 @@ export const NFTMintDialog = ({ trackId, trackTitle, trackArtist }: NFTMintDialo
             />
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={loading || !formData.collection_id || !formData.name || !address}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Minting...
-              </>
-            ) : (
-              'Mint NFT'
-            )}
-          </Button>
-        </form>
+          {canMint && mintCall ? (
+            <OnchainTransaction
+              to={mintCall.to}
+              value={mintCall.value}
+              data={mintCall.data}
+              onSuccess={onMintSuccess}
+              onError={onMintError}
+            >
+              Mint NFT
+            </OnchainTransaction>
+          ) : (
+            <Button disabled className="w-full">
+              {!address
+                ? 'Connect Wallet'
+                : !formData.collection_id
+                ? 'Select Collection'
+                : !formData.name
+                ? 'Enter NFT Name'
+                : 'Mint NFT'}
+            </Button>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
