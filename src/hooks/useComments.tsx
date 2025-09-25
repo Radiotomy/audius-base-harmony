@@ -116,7 +116,6 @@ export const useComments = ({ targetType, targetId }: UseCommentsProps) => {
       return false;
     }
 
-    // Validate comment data
     const validation = validateAndSanitize(commentSchema, {
       content,
       target_type: targetType,
@@ -124,45 +123,47 @@ export const useComments = ({ targetType, targetId }: UseCommentsProps) => {
       parent_id: parentId,
     });
 
-    if (!validation.success) {
+    if (validation.success) {
+      // Validation passed, continue with the validated data
+      setSubmitting(true);
+      try {
+        const { error } = await supabase
+          .from('comments')
+          .insert({
+            user_id: user.id,
+            target_type: validation.data.target_type,
+            target_id: validation.data.target_id,
+            content: sanitizeHtml(validation.data.content),
+            parent_id: validation.data.parent_id
+          });
+
+        if (error) throw error;
+
+        await fetchComments();
+        toast({
+          title: "Success",
+          description: "Comment added successfully",
+        });
+        return true;
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        toast({
+          title: "Error",
+          description: "Failed to add comment",
+          variant: "destructive",
+        });
+        return false;
+      } finally {
+        setSubmitting(false);
+      }
+    } else {
+      const errorResult = validation as { success: false; errors: string[] };
       toast({
         title: "Invalid Comment",
-        description: validation.errors.join(', '),
+        description: errorResult.errors.join(', '),
         variant: "destructive", 
       });
       return false;
-    }
-
-    setSubmitting(true);
-    try {
-      const { error } = await supabase
-        .from('comments')
-        .insert({
-          user_id: user.id,
-          target_type: validation.data.target_type,
-          target_id: validation.data.target_id,
-          content: sanitizeHtml(validation.data.content),
-          parent_id: validation.data.parent_id
-        });
-
-      if (error) throw error;
-
-      await fetchComments();
-      toast({
-        title: "Success",
-        description: "Comment added successfully",
-      });
-      return true;
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add comment",
-        variant: "destructive",
-      });
-      return false;
-    } finally {
-      setSubmitting(false);
     }
   }, [user?.id, targetType, targetId, fetchComments]);
 

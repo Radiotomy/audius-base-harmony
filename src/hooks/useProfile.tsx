@@ -167,9 +167,10 @@ export const useProfile = (userId?: string) => {
     // Validate input data
     const validation = validateAndSanitize(profileUpdateSchema, updates);
     if (!validation.success) {
+      const errorResult = validation as { success: false; errors: string[] };
       toast({
         title: "Validation Error", 
-        description: validation.errors.join(', '),
+        description: errorResult.errors.join(', '),
         variant: "destructive",
       });
       return false;
