@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { parseEther } from 'viem';
 import { toast } from 'sonner';
 
@@ -17,27 +17,22 @@ export const usePaymaster = () => {
   });
   
   const { address } = useAccount();
-  const { writeContract } = useWriteContract();
 
-  const sponsorTransaction = useCallback(async (
+  const checkSponsorship = useCallback(async (
     contractAddress: `0x${string}`,
     functionName: string,
     args: any[],
     value?: bigint
-  ) => {
+  ): Promise<{ sponsored: boolean; transactionHash?: string }> => {
     if (!config.enabled || !config.sponsorGas) {
-      toast.error('Gas sponsorship not enabled');
-      return;
+      return { sponsored: false };
     }
 
     if (!address) {
-      toast.error('Wallet not connected');
-      return;
+      return { sponsored: false };
     }
 
     try {
-      toast.loading('Preparing gasless transaction...');
-      
       // Use Coinbase Paymaster API for gas sponsorship
       const paymasterResponse = await fetch('/api/paymaster/sponsor', {
         method: 'POST',
@@ -52,33 +47,19 @@ export const usePaymaster = () => {
       });
 
       if (!paymasterResponse.ok) {
-        throw new Error('Paymaster sponsorship failed');
+        return { sponsored: false };
       }
 
-      const { sponsored } = await paymasterResponse.json();
-      
-      if (sponsored) {
-        toast.success('Transaction sponsored! No gas fees required.');
-        
-        // Execute the sponsored transaction
-        const result = await writeContract({
-          address: contractAddress,
-          abi: [] as const, // Contract ABI would be provided
-          functionName,
-          args,
-          value,
-        });
-        
-        return result;
-      } else {
-        toast.error('Gas sponsorship unavailable for this transaction');
-      }
+      const result = await paymasterResponse.json();
+      return {
+        sponsored: result.sponsored,
+        transactionHash: result.transactionHash,
+      };
     } catch (error) {
       console.error('Paymaster error:', error);
-      toast.error('Failed to sponsor transaction');
-      throw error;
+      return { sponsored: false };
     }
-  }, [config, address, writeContract]);
+  }, [config, address]);
 
   const toggleSponsorship = useCallback(() => {
     setConfig(prev => ({
@@ -89,7 +70,7 @@ export const usePaymaster = () => {
 
   return {
     config,
-    sponsorTransaction,
+    checkSponsorship,
     toggleSponsorship,
     isEnabled: config.enabled && config.sponsorGas,
   };

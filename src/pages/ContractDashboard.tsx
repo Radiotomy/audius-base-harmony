@@ -1,11 +1,13 @@
 import React from 'react';
-import { ContractDeployment } from '@/components/ContractDeployment';
-import WalletConnect from '@/components/OnchainWallet';
 import Navigation from '@/components/Navigation';
 import MobileNavigation from '@/components/MobileNavigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import OnchainWallet from '@/components/OnchainWallet';
+import { ContractDeployment } from '@/components/ContractDeployment';
+import { BaseEcosystemIntegration } from '@/components/BaseEcosystemIntegration';
+import { FarcasterFrames } from '@/components/FarcasterFrames';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Zap, Coins, Code } from 'lucide-react';
+import { Shield, Zap, Coins, Wallet, Network, Ticket } from 'lucide-react';
 
 const ContractDashboard: React.FC = () => {
   return (
@@ -13,138 +15,158 @@ const ContractDashboard: React.FC = () => {
       <Navigation />
       <MobileNavigation />
       
-      <main className="container mx-auto px-4 py-8 pt-20">
-        <div className="space-y-8">
-          {/* Header */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center space-y-4">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Code className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl font-bold">Smart Contract Dashboard</h1>
-            </div>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Deploy and manage AudioBASE smart contracts on BASE network. 
-              Enable real blockchain transactions for tipping, NFTs, and event ticketing.
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              AudioBASE Launch Dashboard
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Deploy contracts, integrate Base ecosystem features, and launch your music platform 
+              with gasless transactions, social frames, and onchain identity.
             </p>
           </div>
 
-          {/* Features Grid */}
+          <BaseEcosystemIntegration />
+
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card>
-              <CardHeader className="text-center">
-                <Zap className="h-12 w-12 text-primary mx-auto mb-2" />
-                <CardTitle className="text-lg">Artist Tipping</CardTitle>
-                <CardDescription>
-                  Direct ETH tips to artists with minimal fees
-                </CardDescription>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Coins className="h-5 w-5" />
+                  Artist Tipping
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex justify-between">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Enable fans to tip artists directly with ETH. Gasless with Paymaster integration.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
                     <span>Platform Fee:</span>
-                    <Badge variant="secondary">1%</Badge>
+                    <span>1%</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex items-center justify-between text-sm">
                     <span>Gas Sponsored:</span>
-                    <Badge variant="default">Yes</Badge>
+                    <span className="text-green-500">Yes</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="text-center">
-                <Shield className="h-12 w-12 text-primary mx-auto mb-2" />
-                <CardTitle className="text-lg">Music NFTs</CardTitle>
-                <CardDescription>
-                  Create and trade music NFT collections
-                </CardDescription>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Music NFTs
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex justify-between">
-                    <span>Standard:</span>
-                    <Badge variant="secondary">ERC-721</Badge>
-                  </div>
-                  <div className="flex justify-between">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Create music NFTs with Farcaster Frames for viral distribution and social minting.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
                     <span>Royalties:</span>
-                    <Badge variant="default">Up to 10%</Badge>
+                    <span>5-10%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Social Minting:</span>
+                    <span className="text-green-500">Enabled</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="text-center">
-                <Coins className="h-12 w-12 text-primary mx-auto mb-2" />
-                <CardTitle className="text-lg">Event Tickets</CardTitle>
-                <CardDescription>
-                  NFT-based event ticketing system
-                </CardDescription>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ticket className="h-5 w-5" />
+                  Event Tickets
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex justify-between">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Issue blockchain tickets with Base Names integration for seamless UX.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
                     <span>Standard:</span>
-                    <Badge variant="secondary">ERC-1155</Badge>
+                    <span>ERC-1155</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Resale:</span>
-                    <Badge variant="default">Built-in</Badge>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Base Names:</span>
+                    <span className="text-green-500">Supported</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Wallet Connection */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5" />
+                    Wallet Connection
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <OnchainWallet />
+                </CardContent>
+              </Card>
+
+              <FarcasterFrames />
+            </div>
+
+            <div className="space-y-6">
+              <ContractDeployment />
+            </div>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle>Wallet Connection</CardTitle>
-              <CardDescription>
-                Connect your wallet to deploy and interact with smart contracts
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Network className="h-5 w-5" />
+                Base Ecosystem Launch Benefits
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <WalletConnect />
-            </CardContent>
-          </Card>
-
-          {/* Contract Deployment */}
-          <ContractDeployment />
-
-          {/* Network Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Network Information</CardTitle>
-              <CardDescription>
-                AudioBASE is built on BASE - Coinbase's L2 solution
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Network Benefits</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Low transaction fees (~$0.01)</li>
-                    <li>• Fast confirmation times (~2 seconds)</li>
-                    <li>• Ethereum ecosystem compatibility</li>
-                    <li>• Coinbase ecosystem integration</li>
-                  </ul>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium">Contract Features</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Gas sponsorship for users</li>
-                    <li>• Built-in royalty management</li>
-                    <li>• Emergency pause functionality</li>
-                    <li>• Upgradeable proxy patterns</li>
-                  </ul>
-                </div>
+            <CardContent className="grid md:grid-cols-3 gap-6">
+              <div>
+                <h3 className="font-semibold mb-2">Technical Advantages</h3>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li>• $100 gas credits via Paymaster</li>
+                  <li>• 10-100x cheaper than Ethereum</li>
+                  <li>• 2-second confirmation times</li>
+                  <li>• EVM compatibility</li>
+                  <li>• Coinbase Smart Wallet integration</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Social & Identity</h3>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li>• Base Names (.base domains)</li>
+                  <li>• Farcaster Frames integration</li>
+                  <li>• Social music discovery</li>
+                  <li>• Viral NFT minting</li>
+                  <li>• Cross-platform identity</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Growth & Marketing</h3>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li>• 130M+ Coinbase users</li>
+                  <li>• Base App Directory listing</li>
+                  <li>• Ecosystem funding access</li>
+                  <li>• Builder Network community</li>
+                  <li>• Onchain Summer campaigns</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

@@ -1227,6 +1227,39 @@ export type Database = {
           },
         ]
       }
+      paymaster_logs: {
+        Row: {
+          contract_address: string
+          created_at: string
+          function_name: string
+          gas_estimate: number
+          id: string
+          sponsored: boolean
+          transaction_hash: string | null
+          user_address: string
+        }
+        Insert: {
+          contract_address: string
+          created_at?: string
+          function_name: string
+          gas_estimate: number
+          id?: string
+          sponsored?: boolean
+          transaction_hash?: string | null
+          user_address: string
+        }
+        Update: {
+          contract_address?: string
+          created_at?: string
+          function_name?: string
+          gas_estimate?: number
+          id?: string
+          sponsored?: boolean
+          transaction_hash?: string | null
+          user_address?: string
+        }
+        Relationships: []
+      }
       playlist_collaborators: {
         Row: {
           added_by: string
