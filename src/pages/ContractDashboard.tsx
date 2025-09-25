@@ -1,7 +1,7 @@
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import MobileNavigation from '@/components/MobileNavigation';
-import OnchainWallet from '@/components/OnchainWallet';
+import WalletConnect from '@/components/OnchainWallet';
 import { ContractDeployment } from '@/components/ContractDeployment';
 import { BaseEcosystemIntegration } from '@/components/BaseEcosystemIntegration';
 import { FarcasterFrames } from '@/components/FarcasterFrames';
@@ -113,7 +113,7 @@ const ContractDashboard: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <OnchainWallet />
+                  <WalletConnect />
                 </CardContent>
               </Card>
 
