@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAccount, useSendTransaction } from 'wagmi';
+import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
-import { base } from 'wagmi/chains';
 
 interface OnchainTransactionProps {
   to: `0x${string}`;
@@ -27,19 +26,38 @@ export const OnchainTransaction: React.FC<OnchainTransactionProps> = ({
   disabled = false,
 }) => {
   const { isConnected } = useAccount();
-  const { sendTransaction, isPending, error } = useSendTransaction();
+  const { 
+    sendTransaction, 
+    data: hash, 
+    isPending, 
+    error 
+  } = useSendTransaction();
+
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  // Call onSuccess when we get a transaction hash
+  useEffect(() => {
+    if (hash && onSuccess) {
+      onSuccess(hash);
+    }
+  }, [hash, onSuccess]);
+
+  // Call onError when there's an error
+  useEffect(() => {
+    if (error && onError) {
+      onError(error);
+    }
+  }, [error, onError]);
 
   const handleTransaction = async () => {
     try {
-      const hash = await sendTransaction({
+      sendTransaction({
         to,
         value: value ? parseEther(value) : undefined,
         data,
       });
-      
-      if (onSuccess) {
-        onSuccess(hash || '');
-      }
     } catch (err) {
       if (onError) {
         onError(err as Error);
@@ -50,10 +68,12 @@ export const OnchainTransaction: React.FC<OnchainTransactionProps> = ({
   return (
     <Button
       onClick={handleTransaction}
-      disabled={disabled || !isConnected || isPending}
+      disabled={disabled || !isConnected || isPending || isConfirming}
       className={`w-full gradient-primary ${className}`}
     >
-      {isPending ? 'Processing...' : children || 'Execute Transaction'}
+      {isPending || isConfirming 
+        ? 'Processing...' 
+        : children || 'Execute Transaction'}
     </Button>
   );
 };
