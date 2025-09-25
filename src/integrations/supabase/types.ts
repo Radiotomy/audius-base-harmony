@@ -122,6 +122,33 @@ export type Database = {
         }
         Relationships: []
       }
+      api_rate_limits: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          request_count: number | null
+          user_id: string | null
+          window_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          request_count?: number | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          request_count?: number | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       artist_analytics: {
         Row: {
           artist_id: string
@@ -852,6 +879,13 @@ export type Database = {
             foreignKeyName: "fk_events_venue"
             columns: ["venue_id"]
             isOneToOne: false
+            referencedRelation: "public_venue_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_events_venue"
+            columns: ["venue_id"]
+            isOneToOne: false
             referencedRelation: "public_venues"
             referencedColumns: ["id"]
           },
@@ -860,6 +894,13 @@ export type Database = {
             columns: ["venue_id"]
             isOneToOne: false
             referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_events_venue_id"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "public_venue_info"
             referencedColumns: ["id"]
           },
           {
@@ -1659,6 +1700,57 @@ export type Database = {
           },
         ]
       }
+      public_venue_info: {
+        Row: {
+          address: string | null
+          capacity: number | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       public_venues: {
         Row: {
           address: string | null
@@ -1712,19 +1804,14 @@ export type Database = {
       }
     }
     Functions: {
-      get_public_tip_stats: {
+      get_public_tip_aggregates: {
         Args: Record<PropertyKey, never>
         Returns: {
-          amount: number
-          artist_id: string
-          artist_name: string
-          created_at: string
+          avg_tip_range: string
           currency: string
-          masked_artist_wallet_address: string
-          masked_wallet_address: string
-          message: string
-          network: string
-          status: string
+          last_tip_date: string
+          total_amount_range: string
+          total_tips_count: number
         }[]
       }
       get_user_role: {
