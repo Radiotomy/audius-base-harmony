@@ -1804,6 +1804,10 @@ export type Database = {
       }
     }
     Functions: {
+      get_public_profile_columns: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_public_tip_aggregates: {
         Args: Record<PropertyKey, never>
         Returns: {
