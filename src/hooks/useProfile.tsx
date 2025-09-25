@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { profileUpdateSchema, validateAndSanitize } from '@/lib/validation';
 
 interface UserProfile {
   id: string;
@@ -53,15 +54,29 @@ export const useProfile = (userId?: string) => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', targetUserId)
-        .maybeSingle();
+      // Use secure public function for other users' profiles
+      if (user?.id !== targetUserId) {
+        const { data, error } = await supabase
+          .rpc('get_public_profile_data', { _profile_id: targetUserId });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      setProfile(data);
+        setProfile({
+          ...data[0],
+          updated_at: data[0]?.created_at || new Date().toISOString()
+        });
+      } else {
+        // For own profile, get complete data
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', targetUserId)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        setProfile(data);
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
       toast({
@@ -72,7 +87,7 @@ export const useProfile = (userId?: string) => {
     } finally {
       setLoading(false);
     }
-  }, [targetUserId]);
+  }, [targetUserId, user?.id]);
 
   // Fetch profile statistics
   const fetchStats = useCallback(async () => {
@@ -149,12 +164,23 @@ export const useProfile = (userId?: string) => {
       return false;
     }
 
+    // Validate input data
+    const validation = validateAndSanitize(profileUpdateSchema, updates);
+    if (!validation.success) {
+      toast({
+        title: "Validation Error", 
+        description: validation.errors.join(', '),
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setUpdating(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .update({
-          ...updates,
+          ...validation.data,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);

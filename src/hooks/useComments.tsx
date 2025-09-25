@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { commentSchema, validateAndSanitize, sanitizeHtml } from '@/lib/validation';
 
 interface Comment {
   id: string;
@@ -115,11 +116,19 @@ export const useComments = ({ targetType, targetId }: UseCommentsProps) => {
       return false;
     }
 
-    if (!content.trim()) {
+    // Validate comment data
+    const validation = validateAndSanitize(commentSchema, {
+      content,
+      target_type: targetType,
+      target_id: targetId,
+      parent_id: parentId,
+    });
+
+    if (!validation.success) {
       toast({
         title: "Invalid Comment",
-        description: "Comment cannot be empty",
-        variant: "destructive",
+        description: validation.errors.join(', '),
+        variant: "destructive", 
       });
       return false;
     }
@@ -130,10 +139,10 @@ export const useComments = ({ targetType, targetId }: UseCommentsProps) => {
         .from('comments')
         .insert({
           user_id: user.id,
-          target_type: targetType,
-          target_id: targetId,
-          content: content.trim(),
-          parent_id: parentId
+          target_type: validation.data.target_type,
+          target_id: validation.data.target_id,
+          content: sanitizeHtml(validation.data.content),
+          parent_id: validation.data.parent_id
         });
 
       if (error) throw error;

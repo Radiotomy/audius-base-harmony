@@ -1841,6 +1841,23 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_public_profile_data: {
+        Args: { _profile_id: string }
+        Returns: {
+          artist_bio: string
+          artist_location: string
+          artist_verified: boolean
+          audius_handle: string
+          avatar_url: string
+          bio: string
+          created_at: string
+          genres: string[]
+          id: string
+          social_links: Json
+          username: string
+          website_url: string
+        }[]
+      }
       get_public_tip_aggregates: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1861,6 +1878,10 @@ export type Database = {
       }
       user_has_events_at_venue: {
         Args: { _user_id: string; _venue_id: string }
+        Returns: boolean
+      }
+      user_owns_audius_track: {
+        Args: { _track_artist_id: string; _user_id: string }
         Returns: boolean
       }
     }
