@@ -20,6 +20,11 @@ interface UserProfile {
   website_url?: string;
   verified_at?: string;
   verification_status?: string;
+  // Wallet addresses - only visible to profile owner
+  wallet_address?: string;
+  base_wallet_address?: string;
+  preferred_tip_currency?: string;
+  tip_enabled?: boolean;
   created_at: string;
   updated_at: string;
 }

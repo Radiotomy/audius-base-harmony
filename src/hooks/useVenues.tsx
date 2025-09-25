@@ -14,8 +14,8 @@ export interface Venue {
   image_url?: string;
   latitude?: number;
   longitude?: number;
-  contact_email?: string;
-  contact_phone?: string;
+  // Contact info excluded from public view for privacy
+  // contact_email and contact_phone only available to event organizers
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -29,8 +29,9 @@ export const useVenues = () => {
   const fetchVenues = async () => {
     try {
       setLoading(true);
+      // Use public venue view that excludes contact information
       const { data, error } = await supabase
-        .from('venues')
+        .from('public_venue_info')
         .select('*')
         .eq('is_active', true)
         .order('name');
