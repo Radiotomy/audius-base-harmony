@@ -1,6 +1,4 @@
 import React from 'react';
-import Navigation from '@/components/Navigation';
-import MobileNavigation from '@/components/MobileNavigation';
 import WalletConnect from '@/components/OnchainWallet';
 import { ContractDeployment } from '@/components/ContractDeployment';
 import { BaseEcosystemIntegration } from '@/components/BaseEcosystemIntegration';
@@ -13,7 +11,6 @@ import { Shield, Zap, Coins, Wallet, Network, Ticket } from 'lucide-react';
 const ContractDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
