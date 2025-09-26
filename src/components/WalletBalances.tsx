@@ -62,31 +62,18 @@ export const WalletBalances: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <TokenBalanceCard
-                symbol="ETH"
-                balance={ethBalance ? `${formatBalance(ethBalance.formatted)}` : '2.4567'}
-                usdValue={ethBalance ? '6,890.42' : '6,890.42'}
-              />
+              {ethBalance && parseFloat(ethBalance.formatted) > 0 && (
+                <TokenBalanceCard
+                  symbol="ETH"
+                  balance={formatBalance(ethBalance.formatted)}
+                />
+              )}
               
-              {/* USDC Balance on Base */}
-              {isOnBase && (
-                <>
-                  <TokenBalanceCard
-                    symbol="USDC"
-                    balance="1,250.00"
-                    usdValue="1,250.00"
-                  />
-                  <TokenBalanceCard
-                    symbol="WETH"
-                    balance="0.7823"
-                    usdValue="2,194.75"
-                  />
-                  <TokenBalanceCard
-                    symbol="cbBTC"
-                    balance="0.0156"
-                    usdValue="1,534.20"
-                  />
-                </>
+              {/* Show message if no significant balances */}
+              {(!ethBalance || parseFloat(ethBalance.formatted) === 0) && (
+                <div className="text-center py-4 text-muted-foreground text-sm">
+                  No ETH balance detected
+                </div>
               )}
             </div>
           </div>
@@ -103,21 +90,19 @@ export const WalletBalances: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <TokenBalanceCard
-                symbol="SOL"
-                balance={formatBalance(solBalance) || '45.6789'}
-                usdValue="9,867.34"
-              />
-              <TokenBalanceCard
-                symbol="USDC"
-                balance="3,420.50"
-                usdValue="3,420.50"
-              />
-              <TokenBalanceCard
-                symbol="RAY"
-                balance="156.789"
-                usdValue="892.45"
-              />
+              {solBalance && solBalance > 0 && (
+                <TokenBalanceCard
+                  symbol="SOL"
+                  balance={formatBalance(solBalance)}
+                />
+              )}
+              
+              {/* Show message if no significant balances */}
+              {(!solBalance || solBalance === 0) && (
+                <div className="text-center py-4 text-muted-foreground text-sm">
+                  No SOL balance detected
+                </div>
+              )}
             </div>
           </div>
         )}
