@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "compile-contracts": "hardhat compile && hardhat run scripts/compile-contracts.ts",
+    "deploy-info": "echo 'After compilation, copy bytecode from compiled-contracts.ts to supabase/functions/deploy-contracts/index.ts'"
+  }
+}
