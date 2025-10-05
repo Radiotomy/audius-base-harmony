@@ -80,9 +80,14 @@ const WalletConnect = () => {
                   <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
                     Connected
                   </Badge>
-                  <Badge variant="outline">
-                    {getNetworkName(chainId)}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">
+                      {getNetworkName(chainId)}
+                    </Badge>
+                    <Badge variant="outline">
+                      {connector?.name || 'Unknown Wallet'}
+                    </Badge>
+                  </div>
                 </div>
 
                 <div className="space-y-3">

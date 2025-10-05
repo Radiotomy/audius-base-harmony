@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Wallet, Copy, RefreshCw } from 'lucide-react';
-import { useAccount, useBalance, useDisconnect } from 'wagmi';
-import { ConnectWallet, Wallet as OnchainWallet, WalletDropdown, WalletDropdownLink, WalletDropdownDisconnect } from '@coinbase/onchainkit/wallet';
+import { useAccount, useBalance, useDisconnect, useConnect } from 'wagmi';
+import { ConnectWallet, Wallet as OnchainWallet } from '@coinbase/onchainkit/wallet';
 import { Avatar, Name, Identity, Address, EthBalance } from '@coinbase/onchainkit/identity';
 import { useSolana } from '@/contexts/SolanaContext';
 import { useToast } from '@/hooks/use-toast';
@@ -18,10 +18,11 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
   const { toast } = useToast();
   
   // Ethereum/Base wallet hooks
-  const { address: ethAddress, isConnected: isEthConnected } = useAccount();
+  const { address: ethAddress, isConnected: isEthConnected, connector: ethConnector } = useAccount();
   const { data: ethBalance } = useBalance({ address: ethAddress });
   const { disconnect: disconnectEth } = useDisconnect();
-  
+  const { connectors, connect, isPending } = useConnect();
+
   // Solana wallet hooks
   const { 
     connected: isSolConnected, 
@@ -68,6 +69,7 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
             <Wallet className="h-5 w-5" />
             Connect Wallet
           </DialogTitle>
+          <DialogDescription>Choose a wallet to connect and manage balances.</DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="ethereum" className="w-full">
@@ -85,6 +87,16 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
                 <OnchainWallet>
                   <ConnectWallet />
                 </OnchainWallet>
+                {connectors?.find((c) => c.name?.toLowerCase().includes('meta')) && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => connect({ connector: connectors.find((c) => c.name?.toLowerCase().includes('meta'))! })}
+                    disabled={isPending}
+                  >
+                    Connect with MetaMask
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
@@ -104,16 +116,26 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
                       <div>
                         <p className="text-sm text-muted-foreground">Balance</p>
                         <EthBalance address={ethAddress} />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Connected via: <span className="font-medium">{ethConnector?.name || 'Unknown Wallet'}</span>
+                        </p>
                       </div>
-                      <WalletDropdown>
-                        <Button variant="outline" size="sm">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(ethAddress!, 'Ethereum')}
+                        >
                           <Copy className="h-4 w-4" />
                         </Button>
-                        <WalletDropdownLink icon="wallet" href="https://keys.coinbase.com">
-                          Wallet
-                        </WalletDropdownLink>
-                        <WalletDropdownDisconnect />
-                      </WalletDropdown>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => disconnectEth()}
+                        >
+                          Disconnect
+                        </Button>
+                      </div>
                     </div>
                   </OnchainWallet>
                 </div>
