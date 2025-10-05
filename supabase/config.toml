@@ -1,1 +1,4 @@
 project_id = "pahsipyrluqaiuqwzomj"
+
+[functions.deploy-contracts]
+verify_jwt = false
