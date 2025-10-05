@@ -61,26 +61,64 @@ const WalletConnect = () => {
           </TabsList>
 
           <TabsContent value="ethereum" className="space-y-4">
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Connect your smart wallet to access Web3 features
-              </p>
-              <div className="w-full flex justify-center">
-                <Wallet>
-                  <ConnectWallet className="w-full">
-                    Connect Wallet
-                  </ConnectWallet>
-                  <WalletDropdown>
-                    <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
-                      <Avatar />
-                      <Name />
-                      <Address />
-                    </Identity>
-                    <WalletDropdownDisconnect />
-                  </WalletDropdown>
-                </Wallet>
+            {!isConnected || !address ? (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Connect your smart wallet to access Web3 features
+                </p>
+                <div className="w-full flex justify-center">
+                  <Wallet>
+                    <ConnectWallet className="w-full">
+                      Connect Wallet
+                    </ConnectWallet>
+                  </Wallet>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                    Connected
+                  </Badge>
+                  <Badge variant="outline">
+                    {getNetworkName(chainId)}
+                  </Badge>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium">Address</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <code className="text-sm bg-muted px-2 py-1 rounded flex-1">
+                        {formatAddress(address)}
+                      </code>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(address, 'Address')}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Balance</label>
+                    <div className="text-2xl font-bold text-primary mt-1">
+                      {balance ? `${parseFloat(balance.formatted).toFixed(4)} ${balance.symbol}` : 'Loading...'}
+                    </div>
+                  </div>
+
+                  <Button 
+                    variant="outline" 
+                    onClick={() => disconnect()}
+                    className="w-full"
+                  >
+                    Disconnect
+                  </Button>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="solana" className="space-y-4">

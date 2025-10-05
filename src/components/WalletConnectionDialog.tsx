@@ -77,7 +77,7 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
           </TabsList>
           
           <TabsContent value="ethereum" className="space-y-4">
-            {!isEthConnected ? (
+            {!isEthConnected || !ethAddress ? (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Connect your Ethereum wallet to tip artists and mint NFTs on Base network.
@@ -103,7 +103,7 @@ export const WalletConnectionDialog: React.FC<WalletConnectionDialogProps> = ({ 
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <p className="text-sm text-muted-foreground">Balance</p>
-                        <EthBalance />
+                        <EthBalance address={ethAddress} />
                       </div>
                       <WalletDropdown>
                         <Button variant="outline" size="sm">
