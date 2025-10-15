@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, Heart, Users, TrendingUp, Zap, Plus, Radio } from 'lucide-react';
+import audiusBadge from '@/assets/audius-badge.png';
 import { useAudiusTrendingTracks } from '@/hooks/useAudius';
 import { useRadioStation } from '@/hooks/useRadioStation';
 import TrackCard from '@/components/TrackCard';
@@ -385,6 +386,22 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-card/30">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center gap-6">
+            <p className="text-muted-foreground text-center">
+              Developed with <Heart className="inline h-4 w-4 text-red-500 fill-red-500" /> for Indie Artists by Radiotomy
+            </p>
+            <img 
+              src={audiusBadge} 
+              alt="Streaming from Audius" 
+              className="h-16 w-auto"
+            />
+          </div>
+        </div>
+      </footer>
 
         {/* Audio Player */}
         {showPlayer && player.currentTrack && (
