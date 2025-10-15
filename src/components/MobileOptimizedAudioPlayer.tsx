@@ -3,6 +3,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, MoreHorizontal, Che
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePlayer, type RepeatMode } from '@/contexts/PlayerContext';
 import { useFavorites } from '@/hooks/useFavorites';
 import { cn } from '@/lib/utils';
@@ -248,85 +249,122 @@ const MobileOptimizedAudioPlayer = () => {
               <div className="px-6 pb-6">
                 {/* Main Controls */}
                 <div className="flex items-center justify-center gap-8 mb-6">
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    onClick={previous}
-                    disabled={currentIndex <= 0}
-                    className="p-3 touch-target audio-controls"
-                  >
-                    <SkipBack className="h-6 w-6" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        onClick={previous}
+                        disabled={currentIndex <= 0}
+                        className="p-3 touch-target audio-controls"
+                      >
+                        <SkipBack className="h-6 w-6" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Previous track</TooltipContent>
+                  </Tooltip>
                   
-                  <Button
-                    size="lg"
-                    onClick={togglePlay}
-                    className="p-4 rounded-full bg-primary hover:bg-primary/90 w-16 h-16 touch-target audio-controls shadow-glow"
-                  >
-                    {isPlaying ? (
-                      <Pause className="h-8 w-8" />
-                    ) : (
-                      <Play className="h-8 w-8 ml-1" />
-                    )}
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="lg"
+                        onClick={togglePlay}
+                        className="p-4 rounded-full bg-primary hover:bg-primary/90 w-16 h-16 touch-target audio-controls shadow-glow"
+                      >
+                        {isPlaying ? (
+                          <Pause className="h-8 w-8" />
+                        ) : (
+                          <Play className="h-8 w-8 ml-1" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{isPlaying ? 'Pause' : 'Play'}</TooltipContent>
+                  </Tooltip>
                   
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    onClick={next}
-                    disabled={currentIndex >= queue.length - 1}
-                    className="p-3 touch-target audio-controls"
-                  >
-                    <SkipForward className="h-6 w-6" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        onClick={next}
+                        disabled={currentIndex >= queue.length - 1}
+                        className="p-3 touch-target audio-controls"
+                      >
+                        <SkipForward className="h-6 w-6" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Next track</TooltipContent>
+                  </Tooltip>
                 </div>
 
                 {/* Secondary Controls */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={toggleShuffle}
-                      className={cn(
-                        "p-2 touch-target audio-controls",
-                        isShuffled ? "text-primary" : "text-muted-foreground"
-                      )}
-                    >
-                      <Shuffle className="h-5 w-5" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={toggleShuffle}
+                          className={cn(
+                            "p-2 touch-target audio-controls",
+                            isShuffled ? "text-primary" : "text-muted-foreground"
+                          )}
+                        >
+                          <Shuffle className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Shuffle {isShuffled ? 'on' : 'off'}</TooltipContent>
+                    </Tooltip>
                     
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={cycleRepeatMode}
-                      className="p-2 touch-target audio-controls"
-                    >
-                      {getRepeatIcon()}
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={cycleRepeatMode}
+                          className="p-2 touch-target audio-controls"
+                        >
+                          {getRepeatIcon()}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Repeat: {repeatMode === 'none' ? 'off' : repeatMode === 'track' ? 'one' : 'all'}
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleFavorite(currentTrack.id)}
-                      className={cn(
-                        "p-2 touch-target audio-controls",
-                        isFav && "text-red-500 hover:text-red-600"
-                      )}
-                    >
-                      <Heart className={cn("h-5 w-5", isFav && "fill-current")} />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleFavorite(currentTrack.id)}
+                          className={cn(
+                            "p-2 touch-target audio-controls",
+                            isFav && "text-red-500 hover:text-red-600"
+                          )}
+                        >
+                          <Heart className={cn("h-5 w-5", isFav && "fill-current")} />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{isFav ? 'Remove from favorites' : 'Add to favorites'}</TooltipContent>
+                    </Tooltip>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowVolumeControl(!showVolumeControl)}
-                      className="p-2 touch-target audio-controls"
-                    >
-                      <Volume2 className="h-5 w-5" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowVolumeControl(!showVolumeControl)}
+                          className="p-2 touch-target audio-controls"
+                        >
+                          <Volume2 className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Volume</TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
 

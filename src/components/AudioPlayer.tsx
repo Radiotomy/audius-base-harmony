@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Share, List, MoreHorizontal, Minimize2 } from 'lucide-react';
 import { usePlayer, type Track } from '@/contexts/PlayerContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -259,38 +260,53 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
         {/* Controls */}
         <div className="flex justify-center items-center gap-6">
-          <Button 
-            onClick={previous}
-            variant="ghost" 
-            size="sm"
-            disabled={currentIndex <= 0}
-          >
-            <SkipBack className="h-5 w-5" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                onClick={previous}
+                variant="ghost" 
+                size="sm"
+                disabled={currentIndex <= 0}
+              >
+                <SkipBack className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Previous track (←)</TooltipContent>
+          </Tooltip>
           
-          <Button
-            onClick={togglePlay}
-            size="lg"
-            disabled={isLoading}
-            className="h-16 w-16 rounded-full gradient-primary shadow-glow hover:scale-105 transition-bounce"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent" />
-            ) : isPlaying ? (
-              <Pause className="h-6 w-6" />
-            ) : (
-              <Play className="h-6 w-6 ml-0.5" />
-            )}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={togglePlay}
+                size="lg"
+                disabled={isLoading}
+                className="h-16 w-16 rounded-full gradient-primary shadow-glow hover:scale-105 transition-bounce"
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent" />
+                ) : isPlaying ? (
+                  <Pause className="h-6 w-6" />
+                ) : (
+                  <Play className="h-6 w-6 ml-0.5" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{isPlaying ? 'Pause' : 'Play'} (Space)</TooltipContent>
+          </Tooltip>
           
-          <Button 
-            onClick={next}
-            variant="ghost" 
-            size="sm"
-            disabled={currentIndex >= queue.length - 1}
-          >
-            <SkipForward className="h-5 w-5" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                onClick={next}
+                variant="ghost" 
+                size="sm"
+                disabled={currentIndex >= queue.length - 1}
+              >
+                <SkipForward className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Next track (→)</TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Volume & Actions */}
@@ -310,21 +326,36 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           </div>
           
           <div className="flex gap-2">
-            <Button
-              onClick={() => currentTrack && toggleFavorite(currentTrack.id)}
-              variant="ghost"
-              size="sm"
-              className={isFav ? 'text-red-500' : ''}
-            >
-              <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Share className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => currentTrack && toggleFavorite(currentTrack.id)}
+                  variant="ghost"
+                  size="sm"
+                  className={isFav ? 'text-red-500' : ''}
+                >
+                  <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isFav ? 'Remove from favorites' : 'Add to favorites'}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Share className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Share track</TooltipContent>
+            </Tooltip>
             {queue.length > 1 && (
-              <Button variant="ghost" size="sm">
-                <List className="h-4 w-4" />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <List className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View queue</TooltipContent>
+              </Tooltip>
             )}
           </div>
         </div>
