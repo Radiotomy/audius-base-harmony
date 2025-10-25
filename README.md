@@ -1,27 +1,26 @@
-# Welcome to your Lovable project
+# Welcome to the AudioBASE project
 
-## Project info
+AudioBASE is a next-generation music streaming platform that bridges the gap between decentralized music (Audius) and Web3 monetization (Base blockchain). It empowers independent artists with direct fan support while providing music lovers with a seamless streaming experience enhanced by blockchain technology.
 
-**URL**: https://lovable.dev/projects/f2c23c5f-7636-42bd-9132-5f0fac45fe4c
+![Screenshot](https://audiobase.co/screen/screenshot.png)
 
-## How can I edit this code?
+🔗 **[Live Demo](https://audiobase.co)**
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- AudioBASE is a next-generation music streaming platform that bridges the gap between decentralized music (Audius) and Web3 monetization (Base blockchain). It empowers independent artists with direct fan support while providing music lovers with a seamless streaming experience enhanced by blockchain technology.  What It Does AudioBASE combines the best of both worlds:  🎵 Streaming Features:  Stream millions of tracks from the Audius decentralized music network AI-curated radio stations with tracks from diverse artists Advanced audio player with equalizer, visualizer, and keyboard shortcuts Personalized playlists, favorites, and music discovery Real-time trending tracks and artist profiles 💎 Web3 Integration:  Direct Artist Tipping: Send cryptocurrency tips (ETH/SOL) directly to artists Music NFTs: Mint, buy, and collect exclusive music NFTs with royalties Smart Contracts: Secure on-chain transactions for tipping, NFT sales, and event ticketing Multi-Wallet Support: MetaMask, WalletConnect, and Solana wallet integration Base Blockchain: Fast, low-cost transactions powered by Coinbase's Layer 2 🎨 Artist Tools:  Comprehensive artist dashboard with analytics and earnings tracking Upload and manage tracks, albums, and cover art Create and sell music NFTs with customizable royalties Merchandise management system Event and ticket creation Real-time activity feed and fan engagement metrics 📱 Cross-Platform:  Responsive web application Mobile-optimized player and UI Native iOS and Android app support via Capacitor Who It's For For Independent Artists:  Monetize your music beyond traditional streaming platforms Build direct relationships with fans through tips and NFTs Retain more revenue with blockchain-based transactions Access comprehensive analytics and earnings dashboards No middlemen - payments go directly to you For Music Fans:  Discover new independent artists from around the world Support your favorite artists directly with crypto tips Collect exclusive music NFTs and unlock premium content Enjoy ad-free streaming from Audius Own a piece of music history through blockchain-verified collectibles For Web3 Enthusiasts:  Experience real-world utility of blockchain in creative industries Participate in the decentralized music economy Invest in emerging artists through NFT collectibles
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f2c23c5f-7636-42bd-9132-5f0fac45fe4c) and start prompting.
+## 🛠️ Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-**Use your preferred IDE**
+## 📦 Installation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+```bash
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
@@ -35,39 +34,9 @@ npm i
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
+```
 
-**Edit a file directly in GitHub**
+## 👥 Authors
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Speedwolf, Radiotomy, Bryan Payne
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f2c23c5f-7636-42bd-9132-5f0fac45fe4c) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
