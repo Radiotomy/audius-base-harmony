@@ -10,10 +10,20 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  * @title AudioBaseStaking
  * @dev Staking contract for $ABASE tokens with continuous reward distribution
  * @notice Stake $ABASE to earn more $ABASE rewards
+ * @custom:token 0x2DeD753FfEA5AFb256Cc4f3865B867D1425F2134
+ * @custom:network Base Mainnet
  */
 contract AudioBaseStaking is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     
+    // ============ HARDCODED CONFIGURATION ============
+    // AudioBaseToken address on BASE mainnet
+    address public constant ABASE_TOKEN = 0x2DeD753FfEA5AFb256Cc4f3865B867D1425F2134;
+    
+    // Default reward rate: 1e15 wei per second (~86.4 ABASE/day)
+    uint256 public constant DEFAULT_REWARD_RATE = 1000000000000000;
+    
+    // ============ STATE VARIABLES ============
     IERC20 public immutable stakingToken;
     IERC20 public immutable rewardToken;
     
@@ -27,25 +37,23 @@ contract AudioBaseStaking is Ownable, ReentrancyGuard {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
     
+    // ============ EVENTS ============
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event RewardPaid(address indexed user, uint256 reward);
     event RewardRateUpdated(uint256 newRate);
     event RewardsFunded(uint256 amount);
     
-    // AudioBaseToken address on BASE mainnet
-    address public constant ABASE_TOKEN = 0x2DeD753FfEA5AFb256Cc4f3865B867D1425F2134;
-    
     /**
-     * @dev Constructor - uses ABASE token for both staking and rewards
-     * @param _rewardRate Initial reward rate per second (e.g., 1e15 = 0.001 ABASE/sec)
+     * @dev Constructor - NO ARGUMENTS NEEDED
+     * Uses hardcoded ABASE token address and default reward rate
      */
-    constructor(uint256 _rewardRate) Ownable(msg.sender) {
+    constructor() Ownable(msg.sender) {
         stakingToken = IERC20(ABASE_TOKEN);
         rewardToken = IERC20(ABASE_TOKEN);
-        rewardRate = _rewardRate;
+        rewardRate = DEFAULT_REWARD_RATE;
         lastUpdateTime = block.timestamp;
-        rewardsDuration = 365 days; // Default 1 year
+        rewardsDuration = 365 days;
     }
     
     modifier updateReward(address account) {
