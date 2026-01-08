@@ -6,22 +6,21 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 /**
  * @title MusicNFTCollection
  * @dev ERC721 contract for music NFTs with royalties
  */
-contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, ERC2981, Ownable, ReentrancyGuard {
+contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, ReentrancyGuard {
     uint256 private _nextTokenId = 1;
     uint256 public maxSupply;
     uint256 public mintPrice;
     
     string public collectionDescription;
-    string public collectionSymbol;
     address public artist;
+    uint96 public royaltyFeeBps;
     
-    mapping(uint256 => string) public trackIds; // NFT token ID to music track ID
+    mapping(uint256 => string) public trackIds;
     mapping(uint256 => uint256) public mintTimestamps;
     
     event NFTMinted(
@@ -39,24 +38,18 @@ contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, ERC29
         address _artist,
         uint256 _maxSupply,
         uint256 _mintPrice,
-        uint96 _royaltyFeeBps // Basis points (e.g., 500 = 5%)
+        uint96 _royaltyFeeBps
     ) ERC721(name, symbol) Ownable(_artist) {
         collectionDescription = description;
-        collectionSymbol = symbol;
         artist = _artist;
         maxSupply = _maxSupply;
         mintPrice = _mintPrice;
-        
-        // Set default royalty for the artist
-        _setDefaultRoyalty(_artist, _royaltyFeeBps);
+        royaltyFeeBps = _royaltyFeeBps;
     }
 
-    /**
-     * @dev Mint a new music NFT
-     */
     function mintNFT(
         address to,
-        string memory tokenURI,
+        string memory uri,
         string memory trackId
     ) external payable nonReentrant returns (uint256) {
         require(msg.value >= mintPrice, "Insufficient payment");
@@ -66,68 +59,34 @@ contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, ERC29
         uint256 tokenId = _nextTokenId++;
         
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, tokenURI);
+        _setTokenURI(tokenId, uri);
         
         trackIds[tokenId] = trackId;
         mintTimestamps[tokenId] = block.timestamp;
         
-        // Transfer payment to artist using call (recommended over deprecated transfer)
         if (msg.value > 0) {
             (bool success, ) = payable(artist).call{value: msg.value}("");
             require(success, "Payment transfer failed");
         }
         
-        emit NFTMinted(to, tokenId, tokenURI, trackId, msg.value);
+        emit NFTMinted(to, tokenId, uri, trackId, msg.value);
         
         return tokenId;
     }
 
-    /**
-     * @dev Get NFT details
-     */
-    function getNFTDetails(uint256 tokenId) external view returns (
-        string memory tokenURI,
-        string memory trackId,
-        address owner,
-        uint256 mintTimestamp
-    ) {
-        require(_ownerOf(tokenId) != address(0), "Token does not exist");
-        
-        return (
-            tokenURI(tokenId),
-            trackIds[tokenId],
-            ownerOf(tokenId),
-            mintTimestamps[tokenId]
-        );
-    }
-
-    /**
-     * @dev Update mint price (only artist/owner)
-     */
     function setMintPrice(uint256 newPrice) external onlyOwner {
         mintPrice = newPrice;
     }
 
-    /**
-     * @dev Update royalty info (only artist/owner)
-     */
-    function setRoyaltyInfo(address receiver, uint96 feeBasisPoints) external onlyOwner {
-        _setDefaultRoyalty(receiver, feeBasisPoints);
-    }
-
-    /**
-     * @dev Get collection stats
-     */
     function getCollectionStats() external view returns (
-        uint256 totalSupply_,
-        uint256 maxSupply_,
-        uint256 mintPrice_,
-        address artist_
+        uint256 currentSupply,
+        uint256 maxSupplyValue,
+        uint256 mintPriceValue,
+        address artistAddress
     ) {
         return (totalSupply(), maxSupply, mintPrice, artist);
     }
 
-    // Required overrides
     function _update(address to, uint256 tokenId, address auth)
         internal
         override(ERC721, ERC721Enumerable)
@@ -155,7 +114,7 @@ contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, ERC29
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Enumerable, ERC721URIStorage, ERC2981)
+        override(ERC721, ERC721Enumerable, ERC721URIStorage)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
@@ -165,10 +124,9 @@ contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, ERC29
 /**
  * @title MusicNFTFactory
  * @dev Factory contract for creating music NFT collections
+ * @notice AudioBASE Platform - Phase 2 Contract
  */
 contract MusicNFTFactory is Ownable, ReentrancyGuard {
-    // ============ HARDCODED CONFIGURATION ============
-    address public constant DEFAULT_FEE_RECIPIENT = 0xA73bF67c81C466baDE9cF2f0f34de6632D021C5F;
     
     struct CollectionInfo {
         address contractAddress;
@@ -183,7 +141,7 @@ contract MusicNFTFactory is Ownable, ReentrancyGuard {
     mapping(address => CollectionInfo) public collections;
     address[] public allCollections;
     
-    uint256 public creationFee = 0.001 ether; // Fee to create a collection
+    uint256 public creationFee = 0.001 ether;
     address public feeRecipient;
     
     event CollectionCreated(
@@ -195,12 +153,9 @@ contract MusicNFTFactory is Ownable, ReentrancyGuard {
     );
 
     constructor() Ownable(msg.sender) {
-        feeRecipient = DEFAULT_FEE_RECIPIENT;
+        feeRecipient = msg.sender;
     }
 
-    /**
-     * @dev Create a new music NFT collection
-     */
     function createCollection(
         string memory name,
         string memory symbol,
@@ -213,9 +168,8 @@ contract MusicNFTFactory is Ownable, ReentrancyGuard {
         require(bytes(name).length > 0, "Name cannot be empty");
         require(bytes(symbol).length > 0, "Symbol cannot be empty");
         require(maxSupply > 0, "Max supply must be greater than 0");
-        require(royaltyFeeBps <= 1000, "Royalty fee too high"); // Max 10%
+        require(royaltyFeeBps <= 1000, "Royalty fee too high");
 
-        // Deploy new collection contract
         MusicNFTCollection newCollection = new MusicNFTCollection(
             name,
             symbol,
@@ -228,7 +182,6 @@ contract MusicNFTFactory is Ownable, ReentrancyGuard {
 
         address collectionAddress = address(newCollection);
         
-        // Store collection info
         collections[collectionAddress] = CollectionInfo({
             contractAddress: collectionAddress,
             artist: msg.sender,
@@ -241,7 +194,6 @@ contract MusicNFTFactory is Ownable, ReentrancyGuard {
         artistCollections[msg.sender].push(collectionAddress);
         allCollections.push(collectionAddress);
         
-        // Transfer creation fee using call (recommended over deprecated transfer)
         if (msg.value > 0) {
             (bool success, ) = payable(feeRecipient).call{value: msg.value}("");
             require(success, "Fee transfer failed");
@@ -252,37 +204,22 @@ contract MusicNFTFactory is Ownable, ReentrancyGuard {
         return collectionAddress;
     }
 
-    /**
-     * @dev Get artist's collections
-     */
     function getArtistCollections(address artist) external view returns (address[] memory) {
         return artistCollections[artist];
     }
 
-    /**
-     * @dev Get all collections
-     */
     function getAllCollections() external view returns (address[] memory) {
         return allCollections;
     }
 
-    /**
-     * @dev Get collection info
-     */
     function getCollectionInfo(address collectionAddress) external view returns (CollectionInfo memory) {
         return collections[collectionAddress];
     }
 
-    /**
-     * @dev Update creation fee (only owner)
-     */
     function setCreationFee(uint256 newFee) external onlyOwner {
         creationFee = newFee;
     }
 
-    /**
-     * @dev Update fee recipient (only owner)
-     */
     function setFeeRecipient(address newRecipient) external onlyOwner {
         require(newRecipient != address(0), "Invalid recipient");
         feeRecipient = newRecipient;
