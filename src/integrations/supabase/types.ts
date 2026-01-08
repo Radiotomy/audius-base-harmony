@@ -1415,7 +1415,7 @@ export type Database = {
           created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resource_id: string | null
           resource_type: string
           user_agent: string | null
@@ -1426,7 +1426,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type: string
           user_agent?: string | null
@@ -1437,7 +1437,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_type?: string
           user_agent?: string | null
@@ -1837,10 +1837,7 @@ export type Database = {
       }
     }
     Functions: {
-      get_public_profile_columns: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_public_profile_columns: { Args: never; Returns: string }
       get_public_profile_data: {
         Args: { _profile_id: string }
         Returns: {
@@ -1859,7 +1856,7 @@ export type Database = {
         }[]
       }
       get_public_tip_aggregates: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avg_tip_range: string
           currency: string
@@ -1868,14 +1865,8 @@ export type Database = {
           total_tips_count: number
         }[]
       }
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: string
-      }
-      has_role: {
-        Args: { _role: string; _user_id: string }
-        Returns: boolean
-      }
+      get_user_role: { Args: { _user_id: string }; Returns: string }
+      has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
       user_has_events_at_venue: {
         Args: { _user_id: string; _venue_id: string }
         Returns: boolean
