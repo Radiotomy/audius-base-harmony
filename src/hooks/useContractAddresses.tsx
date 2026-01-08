@@ -2,9 +2,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ContractAddresses {
+  treasury?: string;
+  audioBaseToken?: string;
+  tokenVesting?: string;
+  staking?: string;
   artistTipping?: string;
   musicNFTFactory?: string;
   eventTicketing?: string;
+  nftMarketplace?: string;
 }
 
 interface ContractDeployment {
@@ -39,6 +44,26 @@ export const useContractAddresses = () => {
       const contractMap: ContractAddresses = {};
       data?.forEach((deployment: ContractDeployment) => {
         switch (deployment.contract_name) {
+          case 'Treasury':
+            if (!contractMap.treasury) {
+              contractMap.treasury = deployment.contract_address;
+            }
+            break;
+          case 'AudioBaseToken':
+            if (!contractMap.audioBaseToken) {
+              contractMap.audioBaseToken = deployment.contract_address;
+            }
+            break;
+          case 'TokenVesting':
+            if (!contractMap.tokenVesting) {
+              contractMap.tokenVesting = deployment.contract_address;
+            }
+            break;
+          case 'Staking':
+            if (!contractMap.staking) {
+              contractMap.staking = deployment.contract_address;
+            }
+            break;
           case 'ArtistTipping':
             if (!contractMap.artistTipping) {
               contractMap.artistTipping = deployment.contract_address;
@@ -52,6 +77,11 @@ export const useContractAddresses = () => {
           case 'EventTicketing':
             if (!contractMap.eventTicketing) {
               contractMap.eventTicketing = deployment.contract_address;
+            }
+            break;
+          case 'NFTMarketplace':
+            if (!contractMap.nftMarketplace) {
+              contractMap.nftMarketplace = deployment.contract_address;
             }
             break;
         }
@@ -70,7 +100,16 @@ export const useContractAddresses = () => {
       setLoading(true);
       const { data, error } = await supabase.functions.invoke('deploy-contracts', {
         body: {
-          contracts: ['ArtistTipping', 'MusicNFTFactory', 'EventTicketing'],
+          contracts: [
+            'Treasury',
+            'AudioBaseToken', 
+            'TokenVesting',
+            'Staking',
+            'ArtistTipping', 
+            'MusicNFTFactory', 
+            'EventTicketing',
+            'NFTMarketplace'
+          ],
           deployerAddress
         }
       });
@@ -103,8 +142,13 @@ export const useContractAddresses = () => {
     fetchContractAddresses,
     deployContracts,
     // Helper getters with fallbacks
+    treasuryAddress: addresses.treasury || '0x0000000000000000000000000000000000000000',
+    audioBaseTokenAddress: addresses.audioBaseToken || '0x0000000000000000000000000000000000000000',
+    tokenVestingAddress: addresses.tokenVesting || '0x0000000000000000000000000000000000000000',
+    stakingAddress: addresses.staking || '0x0000000000000000000000000000000000000000',
     artistTippingAddress: addresses.artistTipping || '0x0000000000000000000000000000000000000000',
     musicNFTFactoryAddress: addresses.musicNFTFactory || '0x0000000000000000000000000000000000000000',
     eventTicketingAddress: addresses.eventTicketing || '0x0000000000000000000000000000000000000000',
+    nftMarketplaceAddress: addresses.nftMarketplace || '0x0000000000000000000000000000000000000000',
   };
 };
