@@ -12,6 +12,8 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
  * Phase 2 deployment for AudioBASE platform
  */
 contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
+    // ============ HARDCODED CONFIGURATION ============
+    address public constant DEFAULT_FEE_RECIPIENT = 0xA73bF67c81C466baDE9cF2f0f34de6632D021C5F;
     
     struct Listing {
         uint256 tokenId;
@@ -63,8 +65,8 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
     
     event ListingCanceled(bytes32 indexed listingId);
     
-    constructor(address _feeRecipient) Ownable(msg.sender) {
-        feeRecipient = _feeRecipient;
+    constructor() Ownable(msg.sender) {
+        feeRecipient = DEFAULT_FEE_RECIPIENT;
     }
     
     /**

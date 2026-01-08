@@ -13,6 +13,9 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
     using Strings for uint256;
 
+    // ============ HARDCODED CONFIGURATION ============
+    address public constant DEFAULT_FEE_RECIPIENT = 0xA73bF67c81C466baDE9cF2f0f34de6632D021C5F;
+
     struct Event {
         address artist;
         string name;
@@ -87,8 +90,8 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         address indexed user
     );
 
-    constructor(address _feeRecipient) ERC1155("") Ownable(msg.sender) {
-        feeRecipient = _feeRecipient;
+    constructor() ERC1155("") Ownable(msg.sender) {
+        feeRecipient = DEFAULT_FEE_RECIPIENT;
     }
 
     /**

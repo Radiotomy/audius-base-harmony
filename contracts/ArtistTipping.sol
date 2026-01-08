@@ -9,6 +9,9 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  * @dev Contract for tipping artists with ETH and tracking earnings
  */
 contract ArtistTipping is Ownable, ReentrancyGuard {
+    // ============ HARDCODED CONFIGURATION ============
+    address public constant DEFAULT_FEE_RECIPIENT = 0xA73bF67c81C466baDE9cF2f0f34de6632D021C5F;
+    
     struct Tip {
         address tipper;
         address artist;
@@ -43,8 +46,8 @@ contract ArtistTipping is Ownable, ReentrancyGuard {
     event FeeRateUpdated(uint256 newRate);
     event FeeRecipientUpdated(address newRecipient);
 
-    constructor(address _feeRecipient) Ownable(msg.sender) {
-        feeRecipient = _feeRecipient;
+    constructor() Ownable(msg.sender) {
+        feeRecipient = DEFAULT_FEE_RECIPIENT;
     }
 
     /**
