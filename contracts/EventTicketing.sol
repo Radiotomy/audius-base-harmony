@@ -208,15 +208,18 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
             isUsed: false
         }));
 
-        // Transfer payments
+        // Transfer payments using call (recommended over deprecated transfer)
         if (platformFee > 0) {
-            payable(feeRecipient).transfer(platformFee);
+            (bool feeSuccess, ) = payable(feeRecipient).call{value: platformFee}("");
+            require(feeSuccess, "Platform fee transfer failed");
         }
-        payable(eventData.artist).transfer(artistAmount);
+        (bool artistSuccess, ) = payable(eventData.artist).call{value: artistAmount}("");
+        require(artistSuccess, "Artist payment failed");
 
         // Refund excess payment
         if (msg.value > totalPrice) {
-            payable(msg.sender).transfer(msg.value - totalPrice);
+            (bool refundSuccess, ) = payable(msg.sender).call{value: msg.value - totalPrice}("");
+            require(refundSuccess, "Refund failed");
         }
 
         emit TicketPurchased(eventId, ticketTypeId, msg.sender, quantity, totalPrice);
