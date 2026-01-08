@@ -4,19 +4,23 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @title EventTicketing
  * @dev ERC1155 contract for event tickets with multiple ticket types
+ * @notice AudioBASE Platform - Phase 2 Contract
  */
 contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
-    using Strings for uint256;
 
-    // ============ HARDCODED CONFIGURATION ============
-    address public constant DEFAULT_FEE_RECIPIENT = 0xA73bF67c81C466baDE9cF2f0f34de6632D021C5F;
+    struct TicketType {
+        string name;
+        uint256 price;
+        uint256 maxSupply;
+        uint256 currentSupply;
+        bool isActive;
+    }
 
-    struct Event {
+    struct EventData {
         address artist;
         string name;
         string description;
@@ -25,38 +29,15 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         uint256 currentSold;
         bool isActive;
         string metadataURI;
-        mapping(uint256 => TicketType) ticketTypes; // ticketTypeId => TicketType
         uint256 ticketTypeCount;
-    }
-
-    struct TicketType {
-        string name;
-        uint256 price;
-        uint256 maxSupply;
-        uint256 currentSupply;
-        bool isActive;
-        string description;
-    }
-
-    struct Purchase {
-        address buyer;
-        uint256 eventId;
-        uint256 ticketTypeId;
-        uint256 quantity;
-        uint256 totalPaid;
-        uint256 purchaseTime;
-        bool isUsed;
     }
 
     uint256 public nextEventId = 1;
     uint256 public platformFeeRate = 250; // 2.5%
     address public feeRecipient;
 
-    mapping(uint256 => Event) public events;
-    mapping(uint256 => Purchase[]) public eventPurchases; // eventId => purchases
-    mapping(address => mapping(uint256 => uint256[])) public userTickets; // user => eventId => tokenIds
-    
-    // Encoding: eventId * 1000000 + ticketTypeId
+    mapping(uint256 => EventData) public events;
+    mapping(uint256 => mapping(uint256 => TicketType)) public ticketTypes;
     mapping(uint256 => uint256) public tokenToEvent;
     mapping(uint256 => uint256) public tokenToTicketType;
     
@@ -83,20 +64,11 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         uint256 quantity,
         uint256 totalPaid
     );
-    
-    event TicketUsed(
-        uint256 indexed eventId,
-        uint256 indexed tokenId,
-        address indexed user
-    );
 
     constructor() ERC1155("") Ownable(msg.sender) {
-        feeRecipient = DEFAULT_FEE_RECIPIENT;
+        feeRecipient = msg.sender;
     }
 
-    /**
-     * @dev Create a new event
-     */
     function createEvent(
         string memory name,
         string memory description,
@@ -110,46 +82,42 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
 
         uint256 eventId = nextEventId++;
         
-        Event storage newEvent = events[eventId];
-        newEvent.artist = msg.sender;
-        newEvent.name = name;
-        newEvent.description = description;
-        newEvent.eventDate = eventDate;
-        newEvent.maxCapacity = maxCapacity;
-        newEvent.currentSold = 0;
-        newEvent.isActive = true;
-        newEvent.metadataURI = metadataURI;
-        newEvent.ticketTypeCount = 0;
+        events[eventId] = EventData({
+            artist: msg.sender,
+            name: name,
+            description: description,
+            eventDate: eventDate,
+            maxCapacity: maxCapacity,
+            currentSold: 0,
+            isActive: true,
+            metadataURI: metadataURI,
+            ticketTypeCount: 0
+        });
 
         emit EventCreated(eventId, msg.sender, name, eventDate, maxCapacity);
         
         return eventId;
     }
 
-    /**
-     * @dev Add a ticket type to an event
-     */
     function addTicketType(
         uint256 eventId,
         string memory typeName,
-        string memory description,
         uint256 price,
         uint256 maxSupply
     ) external returns (uint256) {
-        Event storage eventData = events[eventId];
+        EventData storage eventData = events[eventId];
         require(eventData.artist == msg.sender, "Only event artist can add ticket types");
         require(eventData.isActive, "Event is not active");
         require(maxSupply > 0, "Max supply must be greater than 0");
 
         uint256 ticketTypeId = eventData.ticketTypeCount++;
         
-        eventData.ticketTypes[ticketTypeId] = TicketType({
+        ticketTypes[eventId][ticketTypeId] = TicketType({
             name: typeName,
             price: price,
             maxSupply: maxSupply,
             currentSupply: 0,
-            isActive: true,
-            description: description
+            isActive: true
         });
 
         emit TicketTypeAdded(eventId, ticketTypeId, typeName, price, maxSupply);
@@ -157,20 +125,17 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         return ticketTypeId;
     }
 
-    /**
-     * @dev Purchase tickets
-     */
     function purchaseTickets(
         uint256 eventId,
         uint256 ticketTypeId,
         uint256 quantity
     ) external payable nonReentrant {
-        Event storage eventData = events[eventId];
+        EventData storage eventData = events[eventId];
         require(eventData.isActive, "Event is not active");
         require(eventData.eventDate > block.timestamp, "Event has already occurred");
         require(quantity > 0, "Quantity must be greater than 0");
 
-        TicketType storage ticketType = eventData.ticketTypes[ticketTypeId];
+        TicketType storage ticketType = ticketTypes[eventId][ticketTypeId];
         require(ticketType.isActive, "Ticket type is not active");
         require(ticketType.currentSupply + quantity <= ticketType.maxSupply, "Not enough tickets available");
         require(eventData.currentSold + quantity <= eventData.maxCapacity, "Event capacity exceeded");
@@ -178,37 +143,18 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         uint256 totalPrice = ticketType.price * quantity;
         require(msg.value >= totalPrice, "Insufficient payment");
 
-        // Calculate fees
         uint256 platformFee = (totalPrice * platformFeeRate) / 10000;
         uint256 artistAmount = totalPrice - platformFee;
 
-        // Update supplies
         ticketType.currentSupply += quantity;
         eventData.currentSold += quantity;
 
-        // Generate unique token ID for each ticket
-        for (uint256 i = 0; i < quantity; i++) {
-            uint256 tokenId = eventId * 1000000 + ticketTypeId * 1000 + ticketType.currentSupply - quantity + i;
-            tokenToEvent[tokenId] = eventId;
-            tokenToTicketType[tokenId] = ticketTypeId;
-            userTickets[msg.sender][eventId].push(tokenId);
-        }
+        uint256 tokenId = eventId * 1000000 + ticketTypeId * 1000;
+        tokenToEvent[tokenId] = eventId;
+        tokenToTicketType[tokenId] = ticketTypeId;
 
-        // Mint tickets
-        _mint(msg.sender, eventId * 1000000 + ticketTypeId * 1000, quantity, "");
+        _mint(msg.sender, tokenId, quantity, "");
 
-        // Record purchase
-        eventPurchases[eventId].push(Purchase({
-            buyer: msg.sender,
-            eventId: eventId,
-            ticketTypeId: ticketTypeId,
-            quantity: quantity,
-            totalPaid: totalPrice,
-            purchaseTime: block.timestamp,
-            isUsed: false
-        }));
-
-        // Transfer payments using call (recommended over deprecated transfer)
         if (platformFee > 0) {
             (bool feeSuccess, ) = payable(feeRecipient).call{value: platformFee}("");
             require(feeSuccess, "Platform fee transfer failed");
@@ -216,7 +162,6 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         (bool artistSuccess, ) = payable(eventData.artist).call{value: artistAmount}("");
         require(artistSuccess, "Artist payment failed");
 
-        // Refund excess payment
         if (msg.value > totalPrice) {
             (bool refundSuccess, ) = payable(msg.sender).call{value: msg.value - totalPrice}("");
             require(refundSuccess, "Refund failed");
@@ -225,24 +170,6 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         emit TicketPurchased(eventId, ticketTypeId, msg.sender, quantity, totalPrice);
     }
 
-    /**
-     * @dev Use a ticket (mark as used)
-     */
-    function useTicket(uint256 tokenId, address user) external {
-        uint256 eventId = tokenToEvent[tokenId];
-        Event storage eventData = events[eventId];
-        require(eventData.artist == msg.sender, "Only event artist can use tickets");
-        require(balanceOf(user, tokenId) > 0, "User does not own this ticket");
-
-        // Burn the ticket
-        _burn(user, tokenId, 1);
-
-        emit TicketUsed(eventId, tokenId, user);
-    }
-
-    /**
-     * @dev Get event details
-     */
     function getEvent(uint256 eventId) external view returns (
         address artist,
         string memory name,
@@ -253,7 +180,7 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         bool isActive,
         uint256 ticketTypeCount
     ) {
-        Event storage eventData = events[eventId];
+        EventData storage eventData = events[eventId];
         return (
             eventData.artist,
             eventData.name,
@@ -266,57 +193,30 @@ contract EventTicketing is ERC1155, Ownable, ReentrancyGuard {
         );
     }
 
-    /**
-     * @dev Get ticket type details
-     */
     function getTicketType(uint256 eventId, uint256 ticketTypeId) external view returns (
         string memory name,
         uint256 price,
         uint256 maxSupply,
         uint256 currentSupply,
-        bool isActive,
-        string memory description
+        bool isActive
     ) {
-        TicketType storage ticketType = events[eventId].ticketTypes[ticketTypeId];
+        TicketType storage ticketType = ticketTypes[eventId][ticketTypeId];
         return (
             ticketType.name,
             ticketType.price,
             ticketType.maxSupply,
             ticketType.currentSupply,
-            ticketType.isActive,
-            ticketType.description
+            ticketType.isActive
         );
     }
 
-    /**
-     * @dev Get user tickets for an event
-     */
-    function getUserTickets(address user, uint256 eventId) external view returns (uint256[] memory) {
-        return userTickets[user][eventId];
-    }
-
-    /**
-     * @dev Set platform fee rate (only owner)
-     */
     function setPlatformFeeRate(uint256 newRate) external onlyOwner {
-        require(newRate <= 1000, "Fee rate too high"); // Max 10%
+        require(newRate <= 1000, "Fee rate too high");
         platformFeeRate = newRate;
     }
 
-    /**
-     * @dev Set fee recipient (only owner)
-     */
     function setFeeRecipient(address newRecipient) external onlyOwner {
         require(newRecipient != address(0), "Invalid recipient");
         feeRecipient = newRecipient;
-    }
-
-    /**
-     * @dev Override URI function
-     */
-    function uri(uint256 tokenId) public view override returns (string memory) {
-        uint256 eventId = tokenToEvent[tokenId];
-        Event storage eventData = events[eventId];
-        return string(abi.encodePacked(eventData.metadataURI, tokenId.toString()));
     }
 }

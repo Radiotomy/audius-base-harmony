@@ -4,16 +4,13 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title NFTMarketplace
- * @dev A comprehensive marketplace for trading music NFTs with royalty support
- * Phase 2 deployment for AudioBASE platform
+ * @dev A marketplace for trading music NFTs
+ * @notice AudioBASE Platform - Phase 2 Contract
  */
-contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
-    // ============ HARDCODED CONFIGURATION ============
-    address public constant DEFAULT_FEE_RECIPIENT = 0xA73bF67c81C466baDE9cF2f0f34de6632D021C5F;
+contract NFTMarketplace is ReentrancyGuard, Ownable {
     
     struct Listing {
         uint256 tokenId;
@@ -32,7 +29,6 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         bool isActive;
     }
     
-    // State variables
     mapping(bytes32 => Listing) public listings;
     mapping(bytes32 => Offer[]) public offers;
     mapping(address => bool) public approvedCollections;
@@ -41,7 +37,8 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant MAX_FEE_RATE = 1000; // 10%
     address public feeRecipient;
     
-    // Events
+    bool public paused;
+    
     event ItemListed(
         bytes32 indexed listingId,
         address indexed nftContract,
@@ -65,13 +62,16 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
     
     event ListingCanceled(bytes32 indexed listingId);
     
-    constructor() Ownable(msg.sender) {
-        feeRecipient = DEFAULT_FEE_RECIPIENT;
+    modifier whenNotPaused() {
+        require(!paused, "Contract is paused");
+        _;
     }
     
-    /**
-     * @dev Create a new listing for an NFT
-     */
+    constructor() Ownable(msg.sender) {
+        feeRecipient = msg.sender;
+        paused = false;
+    }
+    
     function createListing(
         address nftContract,
         uint256 tokenId,
@@ -102,9 +102,6 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         emit ItemListed(listingId, nftContract, tokenId, msg.sender, price);
     }
     
-    /**
-     * @dev Purchase an NFT from a listing
-     */
     function buyItem(bytes32 listingId) external payable whenNotPaused nonReentrant {
         Listing storage listing = listings[listingId];
         require(listing.isActive, "Listing not active");
@@ -116,14 +113,11 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         IERC721 nft = IERC721(listing.nftContract);
         require(nft.ownerOf(listing.tokenId) == listing.seller, "Seller no longer owns token");
         
-        // Calculate fees and royalties
         uint256 platformFee = (listing.price * platformFeeRate) / 10000;
         uint256 sellerAmount = listing.price - platformFee;
         
-        // Transfer NFT
         nft.safeTransferFrom(listing.seller, msg.sender, listing.tokenId);
         
-        // Transfer payment using call (recommended over deprecated transfer)
         if (platformFee > 0) {
             (bool feeSuccess, ) = payable(feeRecipient).call{value: platformFee}("");
             require(feeSuccess, "Platform fee transfer failed");
@@ -131,7 +125,6 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         (bool sellerSuccess, ) = payable(listing.seller).call{value: sellerAmount}("");
         require(sellerSuccess, "Seller payment failed");
         
-        // Refund excess payment
         if (msg.value > listing.price) {
             (bool refundSuccess, ) = payable(msg.sender).call{value: msg.value - listing.price}("");
             require(refundSuccess, "Refund failed");
@@ -140,9 +133,6 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         emit ItemSold(listingId, msg.sender, listing.seller, listing.price);
     }
     
-    /**
-     * @dev Cancel a listing
-     */
     function cancelListing(bytes32 listingId) external {
         Listing storage listing = listings[listingId];
         require(listing.seller == msg.sender || msg.sender == owner(), "Not authorized");
@@ -152,9 +142,6 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         emit ListingCanceled(listingId);
     }
     
-    /**
-     * @dev Make an offer on a listing
-     */
     function makeOffer(bytes32 listingId, uint256 expiresAt) external payable whenNotPaused {
         require(msg.value > 0, "Offer must be greater than 0");
         require(expiresAt > block.timestamp, "Invalid expiration");
@@ -172,21 +159,14 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         emit OfferMade(listingId, msg.sender, msg.value);
     }
     
-    /**
-     * @dev Get listing details
-     */
     function getListing(bytes32 listingId) external view returns (Listing memory) {
         return listings[listingId];
     }
     
-    /**
-     * @dev Get offers for a listing
-     */
     function getOffers(bytes32 listingId) external view returns (Offer[] memory) {
         return offers[listingId];
     }
     
-    // Admin functions
     function approveCollection(address collection) external onlyOwner {
         approvedCollections[collection] = true;
     }
@@ -206,14 +186,17 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
     }
     
     function pause() external onlyOwner {
-        _pause();
+        paused = true;
     }
     
     function unpause() external onlyOwner {
-        _unpause();
+        paused = false;
     }
     
     function emergencyWithdraw() external onlyOwner {
-        payable(owner()).transfer(address(this).balance);
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No balance");
+        (bool success, ) = payable(owner()).call{value: balance}("");
+        require(success, "Withdraw failed");
     }
 }
