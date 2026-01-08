@@ -123,15 +123,18 @@ contract NFTMarketplace is ReentrancyGuard, Ownable, Pausable {
         // Transfer NFT
         nft.safeTransferFrom(listing.seller, msg.sender, listing.tokenId);
         
-        // Transfer payment
+        // Transfer payment using call (recommended over deprecated transfer)
         if (platformFee > 0) {
-            payable(feeRecipient).transfer(platformFee);
+            (bool feeSuccess, ) = payable(feeRecipient).call{value: platformFee}("");
+            require(feeSuccess, "Platform fee transfer failed");
         }
-        payable(listing.seller).transfer(sellerAmount);
+        (bool sellerSuccess, ) = payable(listing.seller).call{value: sellerAmount}("");
+        require(sellerSuccess, "Seller payment failed");
         
         // Refund excess payment
         if (msg.value > listing.price) {
-            payable(msg.sender).transfer(msg.value - listing.price);
+            (bool refundSuccess, ) = payable(msg.sender).call{value: msg.value - listing.price}("");
+            require(refundSuccess, "Refund failed");
         }
         
         emit ItemSold(listingId, msg.sender, listing.seller, listing.price);

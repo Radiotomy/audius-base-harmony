@@ -83,11 +83,13 @@ contract ArtistTipping is Ownable, ReentrancyGuard {
             tipId: tipId
         }));
 
-        // Transfer amounts
+        // Transfer amounts using call (recommended over deprecated transfer)
         if (platformFee > 0) {
-            payable(feeRecipient).transfer(platformFee);
+            (bool feeSuccess, ) = payable(feeRecipient).call{value: platformFee}("");
+            require(feeSuccess, "Platform fee transfer failed");
         }
-        artist.transfer(artistAmount);
+        (bool artistSuccess, ) = artist.call{value: artistAmount}("");
+        require(artistSuccess, "Artist payment failed");
 
         emit TipSent(msg.sender, artist, msg.value, message, tipId, block.timestamp);
     }
