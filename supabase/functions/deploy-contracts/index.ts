@@ -142,11 +142,11 @@ serve(async (req) => {
 
     const deploymentResults = [];
 
-    // Deploy ArtistTipping contract
+    // Deploy ArtistTipping contract (no constructor args - fee recipient is hardcoded)
     if (contracts.includes('ArtistTipping')) {
       const result = await deployContract(
         'ArtistTipping',
-        [deployerAddress], // feeRecipient
+        [], // No constructor args - fee recipient hardcoded in contract
         Deno.env.get('DEPLOYER_PRIVATE_KEY') || ''
       );
       deploymentResults.push({
@@ -157,11 +157,11 @@ serve(async (req) => {
       console.log('ArtistTipping deployed:', result.contractAddress);
     }
 
-    // Deploy MusicNFTFactory contract
+    // Deploy MusicNFTFactory contract (no constructor args - fee recipient is hardcoded)
     if (contracts.includes('MusicNFTFactory')) {
       const result = await deployContract(
         'MusicNFTFactory',
-        [deployerAddress], // feeRecipient
+        [], // No constructor args - fee recipient hardcoded in contract
         Deno.env.get('DEPLOYER_PRIVATE_KEY') || ''
       );
       deploymentResults.push({
@@ -172,11 +172,11 @@ serve(async (req) => {
       console.log('MusicNFTFactory deployed:', result.contractAddress);
     }
 
-    // Deploy EventTicketing contract
+    // Deploy EventTicketing contract (no constructor args - fee recipient is hardcoded)
     if (contracts.includes('EventTicketing')) {
       const result = await deployContract(
         'EventTicketing',
-        [deployerAddress], // feeRecipient
+        [], // No constructor args - fee recipient hardcoded in contract
         Deno.env.get('DEPLOYER_PRIVATE_KEY') || ''
       );
       deploymentResults.push({
