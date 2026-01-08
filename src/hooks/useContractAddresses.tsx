@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+// Deployed AudioBaseToken address on BASE mainnet
+export const ABASE_TOKEN_ADDRESS = '0x2DeD753FfEA5AFb256Cc4f3865B867D1425F2134';
+
 interface ContractAddresses {
   treasury?: string;
   audioBaseToken?: string;
@@ -143,12 +146,14 @@ export const useContractAddresses = () => {
     deployContracts,
     // Helper getters with fallbacks
     treasuryAddress: addresses.treasury || '0x0000000000000000000000000000000000000000',
-    audioBaseTokenAddress: addresses.audioBaseToken || '0x0000000000000000000000000000000000000000',
+    audioBaseTokenAddress: addresses.audioBaseToken || ABASE_TOKEN_ADDRESS,
     tokenVestingAddress: addresses.tokenVesting || '0x0000000000000000000000000000000000000000',
     stakingAddress: addresses.staking || '0x0000000000000000000000000000000000000000',
     artistTippingAddress: addresses.artistTipping || '0x0000000000000000000000000000000000000000',
     musicNFTFactoryAddress: addresses.musicNFTFactory || '0x0000000000000000000000000000000000000000',
     eventTicketingAddress: addresses.eventTicketing || '0x0000000000000000000000000000000000000000',
     nftMarketplaceAddress: addresses.nftMarketplace || '0x0000000000000000000000000000000000000000',
+    // Exported constant
+    ABASE_TOKEN_ADDRESS,
   };
 };

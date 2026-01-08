@@ -33,22 +33,16 @@ contract AudioBaseStaking is Ownable, ReentrancyGuard {
     event RewardRateUpdated(uint256 newRate);
     event RewardsFunded(uint256 amount);
     
+    // AudioBaseToken address on BASE mainnet
+    address public constant ABASE_TOKEN = 0x2DeD753FfEA5AFb256Cc4f3865B867D1425F2134;
+    
     /**
-     * @dev Constructor
-     * @param _stakingToken Token to stake (ABASE)
-     * @param _rewardToken Token to earn (ABASE)
-     * @param _rewardRate Initial reward rate per second
+     * @dev Constructor - uses ABASE token for both staking and rewards
+     * @param _rewardRate Initial reward rate per second (e.g., 1e15 = 0.001 ABASE/sec)
      */
-    constructor(
-        address _stakingToken, 
-        address _rewardToken, 
-        uint256 _rewardRate
-    ) Ownable(msg.sender) {
-        require(_stakingToken != address(0), "Invalid staking token");
-        require(_rewardToken != address(0), "Invalid reward token");
-        
-        stakingToken = IERC20(_stakingToken);
-        rewardToken = IERC20(_rewardToken);
+    constructor(uint256 _rewardRate) Ownable(msg.sender) {
+        stakingToken = IERC20(ABASE_TOKEN);
+        rewardToken = IERC20(ABASE_TOKEN);
         rewardRate = _rewardRate;
         lastUpdateTime = block.timestamp;
         rewardsDuration = 365 days; // Default 1 year
