@@ -103,7 +103,7 @@ contract AudioBaseStaking is Ownable, ReentrancyGuard {
      * @dev Withdraw staked tokens
      * @param amount Amount to withdraw
      */
-    function withdraw(uint256 amount) external nonReentrant updateReward(msg.sender) {
+    function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
         require(userStake[msg.sender] >= amount, "Insufficient stake");
         
@@ -117,7 +117,7 @@ contract AudioBaseStaking is Ownable, ReentrancyGuard {
     /**
      * @dev Claim earned rewards
      */
-    function claimReward() external nonReentrant updateReward(msg.sender) {
+    function claimReward() public nonReentrant updateReward(msg.sender) {
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             rewards[msg.sender] = 0;
