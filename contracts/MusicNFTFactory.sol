@@ -71,9 +71,10 @@ contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, ERC29
         trackIds[tokenId] = trackId;
         mintTimestamps[tokenId] = block.timestamp;
         
-        // Transfer payment to artist
+        // Transfer payment to artist using call (recommended over deprecated transfer)
         if (msg.value > 0) {
-            payable(artist).transfer(msg.value);
+            (bool success, ) = payable(artist).call{value: msg.value}("");
+            require(success, "Payment transfer failed");
         }
         
         emit NFTMinted(to, tokenId, tokenURI, trackId, msg.value);
@@ -240,9 +241,10 @@ contract MusicNFTFactory is Ownable, ReentrancyGuard {
         artistCollections[msg.sender].push(collectionAddress);
         allCollections.push(collectionAddress);
         
-        // Transfer creation fee
+        // Transfer creation fee using call (recommended over deprecated transfer)
         if (msg.value > 0) {
-            payable(feeRecipient).transfer(msg.value);
+            (bool success, ) = payable(feeRecipient).call{value: msg.value}("");
+            require(success, "Fee transfer failed");
         }
         
         emit CollectionCreated(msg.sender, collectionAddress, name, symbol, maxSupply);
