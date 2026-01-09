@@ -70,7 +70,7 @@ contract StreamingRewards is Ownable, ReentrancyGuard {
     /**
      * @dev Report listening time for a user (called by authorized backend)
      * @param listener Address of the listener
-     * @param minutes Number of minutes listened
+     * @param listeningMins Number of minutes listened
      */
     function reportListening(address listener, uint256 listeningMins) external {
         require(authorizedReporters[msg.sender], "Not authorized");
@@ -89,7 +89,7 @@ contract StreamingRewards is Ownable, ReentrancyGuard {
     /**
      * @dev Report listening time for multiple users (batch)
      * @param listeners Array of listener addresses
-     * @param minutesArray Array of minutes listened per user
+     * @param minsArray Array of minutes listened per user
      */
     function reportListeningBatch(
         address[] calldata listeners,
