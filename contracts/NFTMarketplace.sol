@@ -35,6 +35,7 @@ contract NFTMarketplace is ReentrancyGuard, Ownable {
     
     uint256 public platformFeeRate = 250; // 2.5%
     uint256 public constant MAX_FEE_RATE = 1000; // 10%
+    address public constant DEFAULT_FEE_RECIPIENT = 0xA73bF67c81C466baDE9cF2f0f34de6632D021C5F;
     address public feeRecipient;
     
     bool public paused;
@@ -68,7 +69,7 @@ contract NFTMarketplace is ReentrancyGuard, Ownable {
     }
     
     constructor() Ownable(msg.sender) {
-        feeRecipient = msg.sender;
+        feeRecipient = DEFAULT_FEE_RECIPIENT;
         paused = false;
     }
     
