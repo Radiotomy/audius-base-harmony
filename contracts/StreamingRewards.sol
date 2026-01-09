@@ -39,7 +39,7 @@ contract StreamingRewards is Ownable, ReentrancyGuard {
     uint256 public totalListeningMinutes;
     
     // Events
-    event RewardAccrued(address indexed listener, uint256 minutes, uint256 reward);
+    event RewardAccrued(address indexed listener, uint256 listeningMinutes, uint256 reward);
     event RewardClaimed(address indexed listener, uint256 amount);
     event ReporterUpdated(address indexed reporter, bool authorized);
     event RewardRateUpdated(uint256 newRate);
@@ -72,18 +72,18 @@ contract StreamingRewards is Ownable, ReentrancyGuard {
      * @param listener Address of the listener
      * @param minutes Number of minutes listened
      */
-    function reportListening(address listener, uint256 minutes) external {
+    function reportListening(address listener, uint256 listeningMins) external {
         require(authorizedReporters[msg.sender], "Not authorized");
         require(listener != address(0), "Invalid listener");
-        require(minutes > 0, "No listening time");
-        require(minutes <= 1440, "Exceeds daily max"); // Max 24 hours
+        require(listeningMins > 0, "No listening time");
+        require(listeningMins <= 1440, "Exceeds daily max"); // Max 24 hours
         
-        uint256 reward = minutes * rewardPerMinute;
+        uint256 reward = listeningMins * rewardPerMinute;
         
         pendingRewards[listener] += reward;
-        totalListeningMinutes += minutes;
+        totalListeningMinutes += listeningMins;
         
-        emit RewardAccrued(listener, minutes, reward);
+        emit RewardAccrued(listener, listeningMins, reward);
     }
 
     /**
@@ -93,19 +93,19 @@ contract StreamingRewards is Ownable, ReentrancyGuard {
      */
     function reportListeningBatch(
         address[] calldata listeners,
-        uint256[] calldata minutesArray
+        uint256[] calldata minsArray
     ) external {
         require(authorizedReporters[msg.sender], "Not authorized");
-        require(listeners.length == minutesArray.length, "Length mismatch");
+        require(listeners.length == minsArray.length, "Length mismatch");
         require(listeners.length <= 100, "Batch too large");
         
         for (uint256 i = 0; i < listeners.length; i++) {
-            if (listeners[i] != address(0) && minutesArray[i] > 0 && minutesArray[i] <= 1440) {
-                uint256 reward = minutesArray[i] * rewardPerMinute;
+            if (listeners[i] != address(0) && minsArray[i] > 0 && minsArray[i] <= 1440) {
+                uint256 reward = minsArray[i] * rewardPerMinute;
                 pendingRewards[listeners[i]] += reward;
-                totalListeningMinutes += minutesArray[i];
+                totalListeningMinutes += minsArray[i];
                 
-                emit RewardAccrued(listeners[i], minutesArray[i], reward);
+                emit RewardAccrued(listeners[i], minsArray[i], reward);
             }
         }
     }
