@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
@@ -11,7 +12,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  * @title MusicNFTCollection
  * @dev ERC721 contract for music NFTs with royalties
  */
-contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, ReentrancyGuard {
+contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, ERC2981, Ownable, ReentrancyGuard {
     uint256 private _nextTokenId = 1;
     uint256 public maxSupply;
     uint256 public mintPrice;
@@ -40,11 +41,17 @@ contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         uint256 _mintPrice,
         uint96 _royaltyFeeBps
     ) ERC721(name, symbol) Ownable(_artist) {
+        require(_artist != address(0), "Invalid artist");
+        require(_maxSupply > 0, "Max supply must be > 0");
+        require(_royaltyFeeBps <= 1000, "Royalty fee too high");
+        
         collectionDescription = description;
         artist = _artist;
         maxSupply = _maxSupply;
         mintPrice = _mintPrice;
         royaltyFeeBps = _royaltyFeeBps;
+        
+        _setDefaultRoyalty(_artist, _royaltyFeeBps);
     }
 
     function mintNFT(
@@ -114,7 +121,7 @@ contract MusicNFTCollection is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Enumerable, ERC721URIStorage)
+        override(ERC721, ERC721Enumerable, ERC721URIStorage, ERC2981)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
